@@ -1,4 +1,4 @@
-package al1.qa.so.anno;
+package al.qa.so.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

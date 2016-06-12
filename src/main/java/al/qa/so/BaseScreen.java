@@ -1,12 +1,12 @@
-package al1.qa.so;
+package al.qa.so;
 
-import al1.qa.so.anno.ScreenParams;
-import al1.qa.so.anno.Trait;
-import al1.qa.so.exc.ScreenObjectException;
-import al1.qa.so.selenium.ByResolver;
-import al1.qa.so.utils.Utils;
-import al1.qa.so.utils.url.UriComparator;
-import al1.qa.so.utils.url.UrlComparisonStrategy;
+import al.qa.so.anno.ScreenParams;
+import al.qa.so.anno.Trait;
+import al.qa.so.exc.ScreenObjectException;
+import al.qa.so.selenium.ByResolver;
+import al.qa.so.utils.Utils;
+import al.qa.so.utils.url.UriComparator;
+import al.qa.so.utils.url.UrlComparisonStrategy;
 import com.codeborne.selenide.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +41,17 @@ public abstract class BaseScreen {
         initWith(params);
     }
 
+    public <C> C check(Class<C> checkerClass, Consumer<C> proc){
+        C checker = null;
+        try {
+            checker = checkerClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new ScreenObjectException(e);
+        }
+        proc.accept(checker);
+        return checker;
+    }
+
     protected String name(){
         return this.getClass().getSimpleName();
     }
@@ -71,6 +82,15 @@ public abstract class BaseScreen {
     @SuppressWarnings("unchecked")
     protected <T, R extends BaseScreen> R transition(Consumer<T> proc, T argument){
         return Manager.doTransition(proc, argument);
+    }
+
+    protected <T, R extends BaseScreen> R check(Consumer<T> proc){
+        return check(proc, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T, R extends BaseScreen> R check(Consumer<T> proc, T argument){
+        return Manager.doCheck(proc, argument);
     }
 
     void _open(){

@@ -1,7 +1,7 @@
-package al1.qa.so.anno;
+package al.qa.so.anno;
 
-import al1.qa.so.utils.url.UriComparator;
-import al1.qa.so.utils.url.UrlComparisonStrategy;
+import al.qa.so.utils.url.UriComparator;
+import al.qa.so.utils.url.UrlComparisonStrategy;
 
 import java.lang.annotation.*;
 

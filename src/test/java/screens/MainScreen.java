@@ -1,9 +1,12 @@
-package al1.screens;
+package screens;
 
-import al1.qa.so.BaseScreen;
-import al1.qa.so.anno.ScreenParams;
-import al1.qa.so.anno.Trait;
+import al.qa.so.BaseScreen;
+import al.qa.so.anno.ScreenParams;
+import al.qa.so.anno.Trait;
 import com.codeborne.selenide.SelenideElement;
+import org.openqa.selenium.By;
+
+import static com.codeborne.selenide.Selenide.$;
 
 /**
  * @author Alexey Lyanguzov.
@@ -22,7 +25,7 @@ public class MainScreen extends BaseScreen {
     private SelenideElement findButton = by.xpath("//button[contains(@class,'suggest2-form')]");
 
     public SearchResultsScreen search(String searchPhrase){
-        return transition(p->{
+        return (SearchResultsScreen)transition(p->{
             searchField.setValue(searchPhrase);
             findButton.click();
         });

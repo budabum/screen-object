@@ -1,4 +1,4 @@
-package al1.qa.so.selenide;
+package al.qa.so.selenide;
 
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;

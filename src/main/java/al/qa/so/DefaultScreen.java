@@ -1,6 +1,6 @@
-package al1.qa.so;
+package al.qa.so;
 
-import al1.qa.so.anno.ScreenParams;
+import al.qa.so.anno.ScreenParams;
 
 /**
  * @author Alexey Lyanguzov.

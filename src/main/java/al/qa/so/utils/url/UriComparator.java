@@ -1,6 +1,6 @@
-package al1.qa.so.utils.url;
+package al.qa.so.utils.url;
 
-import al1.qa.so.exc.ScreenObjectException;
+import al.qa.so.exc.ScreenObjectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

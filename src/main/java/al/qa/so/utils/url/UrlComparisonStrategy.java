@@ -1,4 +1,4 @@
-package al1.qa.so.utils.url;
+package al.qa.so.utils.url;
 
 /**
  * @author Alexey Lyanguzov.

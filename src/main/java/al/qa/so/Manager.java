@@ -1,8 +1,8 @@
-package al1.qa.so;
+package al.qa.so;
 
-import al1.qa.so.anno.ScreenParams;
-import al1.qa.so.exc.ScreenObjectException;
-import al1.qa.so.utils.StepRecorder;
+import al.qa.so.anno.ScreenParams;
+import al.qa.so.exc.ScreenObjectException;
+import al.qa.so.utils.StepRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -64,6 +63,15 @@ class Manager {
     static <T, R extends BaseScreen> R doAction(Consumer<T> proc, T argument) {
         String actionName = getMethodName();
         LOG.info("Doing action {} on {}", actionName, currentScreen.name());
+//        checkMember(actionName, Action.class);
+        proc.accept(argument);
+        return getCurrentScreen();
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T, R extends BaseScreen> R doCheck(Consumer<T> proc, T argument) {
+        String checkName = getMethodName();
+        LOG.info("Doing check {} on {}", checkName, currentScreen.name());
 //        checkMember(actionName, Action.class);
         proc.accept(argument);
         return getCurrentScreen();

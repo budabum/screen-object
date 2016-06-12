@@ -1,6 +1,6 @@
-package al1.qa.so;
+package al.qa.so;
 
-import al1.qa.so.exc.TestExecutionException;
+import al.qa.so.exc.TestExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

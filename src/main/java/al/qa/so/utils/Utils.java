@@ -1,6 +1,6 @@
-package al1.qa.so.utils;
+package al.qa.so.utils;
 
-import al1.qa.so.exc.ScreenObjectException;
+import al.qa.so.exc.ScreenObjectException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
