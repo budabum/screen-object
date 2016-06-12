@@ -1,8 +1,8 @@
 package al.qa.so.utils.url;
 
 import al.qa.so.exc.ScreenObjectException;
+import al.qa.so.utils.Utils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -15,16 +15,13 @@ import java.util.TreeMap;
  * @author Alexey Lyanguzov.
  */
 public class UriComparator {
-    public static boolean areEquals(URI a, URI b){
-        return areEquals(a, b, CompareAll.class);
-    }
-
-    private static Logger LOG = LoggerFactory.getLogger(UriComparator.class);
+    private static final Logger LOG = Utils.getLogger();
 
     public static boolean areEquals(URI a, URI b, Class<? extends UrlComparisonStrategy> strategy){
         return areEquals(a, b, getUrlPartsFor(strategy));
     }
 
+    @SuppressWarnings("all")
     public static boolean areEquals(URI a, URI b, UriPart...parts){
         Map<UriPart, String> splitA = splitUrl(a);
         Map<UriPart, String> splitB = splitUrl(b);
@@ -38,7 +35,7 @@ public class UriComparator {
         return res;
     }
 
-    public static UriPart[] getUrlPartsFor(Class<? extends UrlComparisonStrategy> strategy){
+    private static UriPart[] getUrlPartsFor(Class<? extends UrlComparisonStrategy> strategy){
         return Arrays.stream(UriPart.values()).filter(p -> !p.isExcludedWith(strategy)).toArray(UriPart[]::new);
     }
 
@@ -59,7 +56,9 @@ public class UriComparator {
 
     public interface CompareAll extends UrlComparisonStrategy{}
     public interface CompareWithoutQuery extends UrlComparisonStrategy{}
+    @SuppressWarnings("all")
     public interface CompareWithoutFragment extends UrlComparisonStrategy{}
+    @SuppressWarnings("all")
     public interface CompareWithPathOnly extends UrlComparisonStrategy{}
 }
 

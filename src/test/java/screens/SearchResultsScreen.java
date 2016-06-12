@@ -1,6 +1,7 @@
 package screens;
 
 import al.qa.so.BaseScreen;
+import al.qa.so.Checker;
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.anno.Trait;
 import al.qa.so.utils.url.UriComparator;
@@ -18,7 +19,7 @@ import static com.codeborne.selenide.Selenide.$$;
         urls="https://yandex.ru/search/",
         urlComparisonStrategy = UriComparator.CompareWithoutQuery.class
 )
-public class SearchResultsScreen extends BaseScreen {
+public class SearchResultsScreen extends BaseScreen<SearchResultsScreen> implements Checker {
     private static final String RESULTS_LIST_XPATH = "//div[contains(@class,'serp-list') and parent::node()[@class='content__left']]";
 
     @Trait

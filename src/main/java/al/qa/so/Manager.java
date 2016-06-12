@@ -3,8 +3,8 @@ package al.qa.so;
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.exc.ScreenObjectException;
 import al.qa.so.utils.StepRecorder;
+import al.qa.so.utils.Utils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * @author Alexey Lyanguzov.
  */
 class Manager {
-    private static Logger LOG = LoggerFactory.getLogger(Manager.class);
+    private static final Logger LOG = Utils.getLogger();
 
     private static final List<Class<? extends BaseScreen>> screens = new ArrayList<>();
     private static BaseScreen currentScreen = DefaultScreen.INSTANCE;
@@ -33,15 +33,15 @@ class Manager {
         return (T)currentScreen;
     }
 
-    static <T extends BaseScreen> T setCurrentScreen(T newCurrentScreen){
+    private static <T extends BaseScreen> T setCurrentScreen(T newCurrentScreen){
         currentScreen = newCurrentScreen;
-        LOG.trace(Arrays.asList(currentScreen.getClass().getDeclaredFields()).toString());
+        LOG.info("Setting current screen => {}", currentScreen.name());
         return getCurrentScreen();
     }
 
     @SuppressWarnings("unchecked")
     static <T extends BaseScreen> T onScreen(Class<T> targetScreenClass, boolean forceNavigation){
-        T targetScreen = null;
+        T targetScreen;
         String targetScreenName = getName(targetScreenClass);
         LOG.info("Navigating from {} to {}", getCurrentScreen().name(), targetScreenName);
         StepRecorder.onScreen(targetScreenName);
@@ -63,7 +63,6 @@ class Manager {
     static <T, R extends BaseScreen> R doAction(Consumer<T> proc, T argument) {
         String actionName = getMethodName();
         LOG.info("Doing action {} on {}", actionName, currentScreen.name());
-//        checkMember(actionName, Action.class);
         proc.accept(argument);
         return getCurrentScreen();
     }
@@ -72,7 +71,6 @@ class Manager {
     static <T, R extends BaseScreen> R doCheck(Consumer<T> proc, T argument) {
         String checkName = getMethodName();
         LOG.info("Doing check {} on {}", checkName, currentScreen.name());
-//        checkMember(actionName, Action.class);
         proc.accept(argument);
         return getCurrentScreen();
     }
@@ -82,7 +80,6 @@ class Manager {
         String transitionName = getMethodName();
         R targetScreen = (R) getTargetScreen(transitionName);
         LOG.info("Doing transition '{}' from {} to {}", transitionName, currentScreen.name(), targetScreen.name());
-//        checkMember(transitionName, Transition.class);
         proc.accept(argument);
         if(!targetScreen.isOpened()){
             throw new ScreenObjectException("Screen %s is not opened. Current screen is %s",
@@ -109,17 +106,8 @@ class Manager {
         }
     }
 
-//    private static void checkMember(String methodName, Class annotationClass){
-//        Method method = getMethod(methodName);
-//        if(method.getAnnotation(annotationClass) == null){
-//            throw new ScreenObjectException("Method '"+ methodName +"' of class '"+ getCurrentScreen().name() +
-//                    "' must be annotated as @"+annotationClass.getSimpleName());
-//        }
-//    }
-
     private static Method getMethod(String methodName){
         Method[] methods = getCurrentScreen().getClass().getMethods();
-//        Method meth = Arrays.stream(methods).filter(m -> m.getName().equals(methodName)).findFirst().orElseGet(null);
         Method meth = Arrays.stream(methods).filter(m -> m.getName().equals(methodName)).findFirst().orElseGet(null);
         LOG.trace("Found method {}", meth);
         return meth;
@@ -153,7 +141,7 @@ class Manager {
         if(!screenInstance.isOpened()){
             throw new ScreenObjectException("Screen " + screenName + " is not opened!");
         }
-        return setCurrentScreen(screenInstance);
+        return screenInstance;
     }
 
     private static <T extends BaseScreen> T instantiateScreen(Class<T> screenClass) {

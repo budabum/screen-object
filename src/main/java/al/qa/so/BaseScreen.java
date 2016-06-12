@@ -7,9 +7,9 @@ import al.qa.so.selenium.ByResolver;
 import al.qa.so.utils.Utils;
 import al.qa.so.utils.url.UriComparator;
 import al.qa.so.utils.url.UrlComparisonStrategy;
-import com.codeborne.selenide.*;
+import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.SelenideElement;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -26,10 +26,10 @@ import static com.codeborne.selenide.WebDriverRunner.url;
 /**
  * @author Alexey Lyanguzov.
  */
-public abstract class BaseScreen {
+public abstract class BaseScreen<ScreenChecker extends Checker> {
     protected final ByResolver by = ByResolver.INSTANCE;
 
-    private static Logger LOG = LoggerFactory.getLogger(BaseScreen.class);
+    private static final Logger LOG = Utils.getLogger();
 
     private final List<URI> uris = new ArrayList<>();
     private final Class<? extends UrlComparisonStrategy> urlComparisonStrategy;
@@ -41,26 +41,26 @@ public abstract class BaseScreen {
         initWith(params);
     }
 
-    public <C> C check(Class<C> checkerClass, Consumer<C> proc){
-        C checker = null;
-        try {
-            checker = checkerClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new ScreenObjectException(e);
-        }
-        proc.accept(checker);
-        return checker;
+    @SuppressWarnings("unchecked")
+    public ScreenChecker ensure(Consumer<ScreenChecker> proc){
+        return ensure((ScreenChecker)this, proc);
     }
 
-    protected String name(){
+    @SuppressWarnings("all")
+    public ScreenChecker ensure(ScreenChecker checker, Consumer<ScreenChecker> proc){
+        proc.accept(checker);
+        return (ScreenChecker)this;
+    }
+
+    String name(){
         return this.getClass().getSimpleName();
     }
 
-    protected boolean isOpened(){
+    boolean isOpened(){
         return isOpened(true);
     }
 
-    protected boolean isOpened(boolean waitForProgress){
+    boolean isOpened(boolean waitForProgress){
         return waitForNoProgressIndicator(waitForProgress) &&
                 waitForTraits() &&
                 isUrlCorrect();
@@ -70,7 +70,7 @@ public abstract class BaseScreen {
         return action(proc, null);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("all")
     protected <T, R extends BaseScreen> R action(Consumer<T> proc, T argument){
         return Manager.doAction(proc, argument);
     }
@@ -79,7 +79,7 @@ public abstract class BaseScreen {
         return transition(proc, null);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("all")
     protected <T, R extends BaseScreen> R transition(Consumer<T> proc, T argument){
         return Manager.doTransition(proc, argument);
     }
@@ -88,7 +88,7 @@ public abstract class BaseScreen {
         return check(proc, null);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("all")
     protected <T, R extends BaseScreen> R check(Consumer<T> proc, T argument){
         return Manager.doCheck(proc, argument);
     }
@@ -136,7 +136,7 @@ public abstract class BaseScreen {
             throw new ScreenObjectException("Screen " + name() + " does not have trait elements");
         }
         for(Field traitField : traits){
-            SelenideElement trait = null;
+            SelenideElement trait;
             try {
                 traitField.setAccessible(true);
                 trait = (SelenideElement) traitField.get(this);
