@@ -7,7 +7,8 @@ import org.testng.annotations.Test;
 import screens.TestScreens;
 
 import static al.qa.so.SO.navigateTo;
-import static screens.TestScreens.MAIN_SCREEN;
+import static al.qa.so.SO.onScreen;
+import static screens.TestScreens.*;
 
 /**
  * @author Alexey Lyanguzov.
@@ -23,14 +24,33 @@ public class SampleTest1 {
     }
 
     @Test
-    public void testSearch(){
+    public void testSearchText(){
         String phrase = "something";
+        String phrase2 = "anything";
         navigateTo(MAIN_SCREEN)
             .search(phrase)
             .ensure(c->{c
                 .returnedResultsCount(10)
                 .allSearchResultContains(phrase);
             });
+        onScreen(SEARCH_RESULTS_SCREEN)
+            .search(phrase2)
+            .ensure(c->{c
+                .returnedResultsCount(10)
+                .allSearchResultContains(phrase2);
+            });
+    }
+
+    @Test
+    public void testSearchImages(){
+        String phrase = "table";
+        navigateTo(IMAGES_SCREEN)
+            .search(phrase)
+            .ensure(c->{c
+                .returnedResultsCount(295);
+            });
+        onScreen(IMAGES_SCREEN)
+            .changeSize("Маленький");
     }
 
 }

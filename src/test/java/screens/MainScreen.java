@@ -25,7 +25,7 @@ public class MainScreen extends BaseScreen {
     private SelenideElement findButton = by.xpath("//button[contains(@class,'suggest2-form')]");
 
     public SearchResultsScreen search(String searchPhrase){
-        return (SearchResultsScreen)transition(p->{
+        return (SearchResultsScreen) transition(p->{
             searchField.setValue(searchPhrase);
             findButton.click();
         });

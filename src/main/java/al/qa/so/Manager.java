@@ -4,12 +4,12 @@ import al.qa.so.anno.ScreenParams;
 import al.qa.so.exc.ScreenObjectException;
 import al.qa.so.utils.StepRecorder;
 import al.qa.so.utils.Utils;
+import com.codeborne.selenide.SelenideElement;
 import org.slf4j.Logger;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -21,11 +21,20 @@ class Manager {
     private static final List<Class<? extends BaseScreen>> screens = new ArrayList<>();
     private static BaseScreen currentScreen = DefaultScreen.INSTANCE;
 
+    static final Map<String, String> fieldNames = new HashMap<>();
+
     //TODO: should not it be in SO?
     static <T extends BaseScreen> Class<T> register(Class<T> screenClass){
         checkScreen(screenClass);
         screens.add(screenClass);
         return screenClass;
+    }
+
+    static String getFieldName(int fieldHash){
+        String key = getFieldKey(getCurrentScreen().getClass().getName(), fieldHash);
+        String name = fieldNames.get(key);
+        LOG.trace("Found field name: {} for key {} among {}", name, key, fieldNames);
+        return name;
     }
 
     @SuppressWarnings("unchecked")
@@ -36,6 +45,7 @@ class Manager {
     private static <T extends BaseScreen> T setCurrentScreen(T newCurrentScreen){
         currentScreen = newCurrentScreen;
         LOG.info("Setting current screen => {}", currentScreen.name());
+        setFieldNames();
         return getCurrentScreen();
     }
 
@@ -53,8 +63,10 @@ class Manager {
             targetScreen = open(targetScreenClass);
         }
         else{
-            throw new ScreenObjectException(
-                    "Expected to be on "+ targetScreenName +" but actually on " + currentScreen.name());
+            String msg = targetScreenName.equals(currentScreen.name()) ?
+                String.format("Target screen %s not actually opened", targetScreenName) :
+                String.format("Expected to be on %s but actually on %s", targetScreenName, currentScreen.name());
+            throw new ScreenObjectException(msg);
         }
         return setCurrentScreen(targetScreen);
     }
@@ -89,6 +101,21 @@ class Manager {
         return setCurrentScreen(targetScreen);
     }
 
+    private static void setFieldNames() {
+        Arrays.stream(getCurrentScreen().getClass().getDeclaredFields()).forEach(field->{
+            if(field.getType().isAssignableFrom(SelenideElement.class)){
+                field.setAccessible(true);
+                try {
+                    SelenideElement value = (SelenideElement)field.get(getCurrentScreen());
+                    String key = Manager.getFieldKey(field, value);
+                    Manager.fieldNames.put(key, field.getName());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
     private static <T extends BaseScreen> String getName(Class<T> screenClass){
         String name = screenClass.getSimpleName();
         if(!screens.contains(screenClass)){
@@ -118,19 +145,23 @@ class Manager {
         return stackTraceElement.getMethodName();
     }
 
-    private static BaseScreen getTargetScreen(String methodName){
-        try {
-            Method theMethod = getMethod(methodName);
-            return (BaseScreen)theMethod.getReturnType().newInstance();
-        }
-        catch (InstantiationException | IllegalAccessException exc) {
-            throw new ScreenObjectException(exc);
-        }
+    @SuppressWarnings("unchecked")
+    private static <T extends BaseScreen> T getTargetScreen(String methodName){
+        Method theMethod = getMethod(methodName);
+        return instantiateScreen((Class<T>)theMethod.getReturnType());
     }
 
     private static boolean isOnScreen(String targetScreenName){
         LOG.debug("Checking if already on screen {}", targetScreenName);
         return currentScreen.name().equals(targetScreenName) && currentScreen.isOpened(false);
+    }
+
+    static String getFieldKey(Field field, SelenideElement value){
+        return getFieldKey(field.getDeclaringClass().getName(), value.hashCode());
+    }
+
+    private static String getFieldKey(String screenName, int fieldHash){
+        return String.format("%s:%s", screenName, fieldHash);
     }
 
     private static <T extends BaseScreen> T open(Class<T> screenClass) {
@@ -146,7 +177,8 @@ class Manager {
 
     private static <T extends BaseScreen> T instantiateScreen(Class<T> screenClass) {
         try{
-            return screenClass.newInstance();
+            T screenInstance = screenClass.newInstance();
+            return screenInstance;
         } catch (InstantiationException | IllegalAccessException exc) {
             throw new ScreenObjectException(exc);
         }

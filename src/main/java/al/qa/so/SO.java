@@ -39,4 +39,8 @@ public class SO {
         throw new TestExecutionException(message);
     }
 
+    public static String fieldName(int fieldHash){
+        return Manager.getFieldName(fieldHash);
+    }
+
 }

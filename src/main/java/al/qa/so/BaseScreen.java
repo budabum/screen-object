@@ -13,9 +13,7 @@ import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -42,17 +40,17 @@ public abstract class BaseScreen<ScreenChecker extends Checker> {
     }
 
     @SuppressWarnings("unchecked")
-    public ScreenChecker ensure(Consumer<ScreenChecker> proc){
+    public <T extends BaseScreen> T ensure(Consumer<ScreenChecker> proc){
         return ensure((ScreenChecker)this, proc);
     }
 
     @SuppressWarnings("all")
-    public ScreenChecker ensure(ScreenChecker checker, Consumer<ScreenChecker> proc){
+    public <T extends BaseScreen> T ensure(ScreenChecker checker, Consumer<ScreenChecker> proc){
         proc.accept(checker);
-        return (ScreenChecker)this;
+        return (T)this;
     }
 
-    String name(){
+    public String name(){
         return this.getClass().getSimpleName();
     }
 
@@ -76,12 +74,12 @@ public abstract class BaseScreen<ScreenChecker extends Checker> {
     }
 
     protected <T, R extends BaseScreen> R transition(Consumer<T> proc){
-        return transition(proc, null);
+        return (R)transition(proc, null);
     }
 
     @SuppressWarnings("all")
     protected <T, R extends BaseScreen> R transition(Consumer<T> proc, T argument){
-        return Manager.doTransition(proc, argument);
+        return (R)Manager.doTransition(proc, argument);
     }
 
     protected <T, R extends BaseScreen> R check(Consumer<T> proc){
@@ -133,7 +131,7 @@ public abstract class BaseScreen<ScreenChecker extends Checker> {
 
     private boolean waitForTraits(){
         if(traits.isEmpty()){
-            throw new ScreenObjectException("Screen " + name() + " does not have trait elements");
+            throw new ScreenObjectException("Screen %s does not have trait elements", name());
         }
         for(Field traitField : traits){
             SelenideElement trait;

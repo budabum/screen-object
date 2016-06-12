@@ -31,6 +31,7 @@ public class UriComparator {
             String valA = splitA.get(p);
             String valB = splitB.get(p);
             res = res && valA.equals(valB);
+            LOG.trace("Comparing '{}' ({} == {}) = {}", p, valA, valB, res);
         }
         return res;
     }
