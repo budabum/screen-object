@@ -7,7 +7,6 @@ import al.qa.so.utils.Utils;
 import com.codeborne.selenide.SelenideElement;
 import org.slf4j.Logger;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
@@ -21,7 +20,7 @@ class Manager {
     private static final List<Class<? extends BaseScreen>> screens = new ArrayList<>();
     private static BaseScreen currentScreen = DefaultScreen.INSTANCE;
 
-    static final Map<String, String> fieldNames = new HashMap<>();
+    private static final Map<SelenideElement, String> fieldNames = new HashMap<>();
 
     //TODO: should not it be in SO?
     static <T extends BaseScreen> Class<T> register(Class<T> screenClass){
@@ -30,8 +29,7 @@ class Manager {
         return screenClass;
     }
 
-    static String getFieldName(int fieldHash){
-        String key = getFieldKey(getCurrentScreen().getClass().getName(), fieldHash);
+    static String getFieldName(SelenideElement key){
         String name = fieldNames.get(key);
         LOG.trace("Found field name: {} for key {} among {}", name, key, fieldNames);
         return name;
@@ -90,7 +88,7 @@ class Manager {
     @SuppressWarnings("unchecked")
     static <T, R extends BaseScreen> R doTransition(Consumer<T> proc, T argument) {
         String transitionName = getMethodName();
-        R targetScreen = (R) getTargetScreen(transitionName);
+        R targetScreen = getTargetScreen(transitionName);
         LOG.info("Doing transition '{}' from {} to {}", transitionName, currentScreen.name(), targetScreen.name());
         proc.accept(argument);
         if(!targetScreen.isOpened()){
@@ -106,9 +104,8 @@ class Manager {
             if(field.getType().isAssignableFrom(SelenideElement.class)){
                 field.setAccessible(true);
                 try {
-                    SelenideElement value = (SelenideElement)field.get(getCurrentScreen());
-                    String key = Manager.getFieldKey(field, value);
-                    Manager.fieldNames.put(key, field.getName());
+                    SelenideElement key = (SelenideElement)field.get(getCurrentScreen());
+                    fieldNames.put(key, field.getName());
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -156,14 +153,6 @@ class Manager {
         return currentScreen.name().equals(targetScreenName) && currentScreen.isOpened(false);
     }
 
-    static String getFieldKey(Field field, SelenideElement value){
-        return getFieldKey(field.getDeclaringClass().getName(), value.hashCode());
-    }
-
-    private static String getFieldKey(String screenName, int fieldHash){
-        return String.format("%s:%s", screenName, fieldHash);
-    }
-
     private static <T extends BaseScreen> T open(Class<T> screenClass) {
         String screenName = screenClass.getSimpleName();
         LOG.debug("Opening screen {}", screenName);
@@ -177,8 +166,7 @@ class Manager {
 
     private static <T extends BaseScreen> T instantiateScreen(Class<T> screenClass) {
         try{
-            T screenInstance = screenClass.newInstance();
-            return screenInstance;
+            return screenClass.newInstance();
         } catch (InstantiationException | IllegalAccessException exc) {
             throw new ScreenObjectException(exc);
         }

@@ -3,6 +3,7 @@ package al.qa.so;
 import al.qa.so.exc.ScreenObjectException;
 import al.qa.so.exc.TestExecutionException;
 import al.qa.so.utils.Utils;
+import com.codeborne.selenide.SelenideElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +40,8 @@ public class SO {
         throw new TestExecutionException(message);
     }
 
-    public static String fieldName(int fieldHash){
-        return Manager.getFieldName(fieldHash);
+    public static String fieldName(SelenideElement field){
+        return Manager.getFieldName(field);
     }
 
 }

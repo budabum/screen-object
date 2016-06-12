@@ -50,7 +50,7 @@ public class SOElementProxy implements InvocationHandler {
             String strArgs = (args == null || args.length == 0) ? "" :
                 String.join(", ", Arrays.stream(args).map(Object::toString).collect(Collectors.toList()));
             LOG.debug("WebDriver Interaction: {}({}) on {} on {}",
-                method.getName(), strArgs, SO.fieldName(realSelenideElement.hashCode()), SO.currentScreen().name());
+                method.getName(), strArgs, SO.fieldName(realSelenideElement), SO.currentScreen().name());
         }
     }
 
