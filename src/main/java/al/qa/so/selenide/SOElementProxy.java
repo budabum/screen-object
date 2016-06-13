@@ -34,10 +34,9 @@ public class SOElementProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if(realSelenideElement == null) init();
-//        System.out.println("Before calling method " + method.getName());
         doBeforeCall(method, args);
         Object res = method.invoke(realSelenideElement, args);
-//        System.out.println("After calling method " + method.getName());
+        doAfterCall(method, args);
         return res;
     }
 
@@ -56,6 +55,9 @@ public class SOElementProxy implements InvocationHandler {
 
     private void doBeforeCall(Method method, Object[] args) {
         reportWebDriverInteraction(method, args);
+    }
+
+    private void doAfterCall(Method method, Object[] args) {
     }
 
 }

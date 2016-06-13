@@ -18,6 +18,7 @@ public class SampleTest1 {
     @BeforeSuite
     private void before1(){
         Configuration.baseUrl = "";
+        Configuration.browser = "chrome";
         Configuration.screenshots = false;
 
         SO.addScreens(TestScreens.class);

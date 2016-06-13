@@ -31,7 +31,7 @@ class Manager {
 
     static String getFieldName(SelenideElement key){
         String name = fieldNames.get(key);
-        LOG.trace("Found field name: {} for key {} among {}", name, key, fieldNames);
+        LOG.trace("Found field name: {} for key {}", name, key);
         return name;
     }
 
@@ -55,6 +55,7 @@ class Manager {
         StepRecorder.onScreen(targetScreenName);
         if(isOnScreen(targetScreenName)){
             LOG.debug("Screen {} is already opened", targetScreenName);
+//            return instantiateScreen((Class<T>)getCurrentScreen().getClass());
             return (T)currentScreen;
         }
         else if(forceNavigation){

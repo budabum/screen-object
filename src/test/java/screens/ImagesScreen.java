@@ -24,7 +24,7 @@ public class ImagesScreen extends BaseScreen<ImagesScreen> implements Checker {
     @Trait
     private SelenideElement searchField = by.xpath("//input[@type='search']");
     private SelenideElement findButton = by.xpath("//button[contains(@class,'suggest2-form')]");
-    private SelenideElement sizeChooserButton = by.xpath("//span[text()='Размер']");
+    private SelenideElement sizeChooserButton = by.xpath("//span[text()='Размер']/parent::node()");
 
     public ImagesScreen search(String searchPhrase){
         return action(p->{
