@@ -2,6 +2,7 @@ package al.qa.so.selenide;
 
 import al.qa.so.SO;
 import al.qa.so.utils.Utils;
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
 import org.slf4j.Logger;
@@ -9,7 +10,9 @@ import org.slf4j.Logger;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,6 +26,11 @@ public class SOElementProxy implements InvocationHandler {
     private static final List<String> WEBDRIVER_INTERACTION = Stream.of(
         "click", "setValue", "val", "followLink"
     ).collect(Collectors.toList());
+
+    private static final Map<String, String> HUMANIZE = new HashMap<String, String>(){{
+        put("click", "Click%s on");
+        put("setValue", "Setting value %s in");
+    }};
 
     private final By by;
     private SelenideElement realSelenideElement;
@@ -40,17 +48,48 @@ public class SOElementProxy implements InvocationHandler {
         return res;
     }
 
+    private String humanizeInteraction(String methodName, String strArgs){
+        if(HUMANIZE.keySet().contains(methodName)){
+            return String.format(HUMANIZE.get(methodName), strArgs);
+        }
+        return methodName + strArgs;
+    }
+
+    private String humanizeShould(String methodName, String strArgs){
+        String[] shouldParts = methodName.replaceAll("([a-z])([A-Z])", "$1 $2").split(" ");
+        String shouldName = String.join(" ", Arrays.stream(shouldParts).map(String::toLowerCase).collect(Collectors.toList()));
+        return shouldName + " " + strArgs;
+    }
+
     private void init(){
         this.realSelenideElement = $(by);
     }
 
     private void reportWebDriverInteraction(Method method, Object[] args) {
-        if(WEBDRIVER_INTERACTION.contains(method.getName())){
+        if(isWebdriveInteraction(method)){
             String strArgs = (args == null || args.length == 0) ? "" :
-                String.join(", ", Arrays.stream(args).map(Object::toString).collect(Collectors.toList()));
-            LOG.debug("WebDriver Interaction: {}({}) on {} on {}",
+                "('" + String.join(", ", Arrays.stream(args).map(Object::toString).collect(Collectors.toList()))+"')";
+            LOG.trace("WebDriver Interaction: {}({}) on {} on {}",
                 method.getName(), strArgs, SO.fieldName(realSelenideElement), SO.currentScreen().name());
+            SO.getStepRecorder().driverInteraction("%s %s",
+                humanizeInteraction(method.getName(), strArgs), SO.fieldName(realSelenideElement));
         }
+        if(isShould(method)){
+            Condition[] conditions;
+            conditions = (args == null || args.length == 0) ? new Condition[]{} : (Condition[])args[0];
+            String strArgs = String.join(", ", Arrays.stream(conditions).map(Object::toString).collect(Collectors.toList()));
+            LOG.trace("{} {}", SO.fieldName(realSelenideElement), humanizeShould(method.getName(), strArgs));
+            SO.getStepRecorder().driverInteraction("... expecting that %s %s", SO.fieldName(realSelenideElement),
+                humanizeShould(method.getName(), strArgs));
+        }
+    }
+
+    private boolean isWebdriveInteraction(Method method){
+        return WEBDRIVER_INTERACTION.contains(method.getName());
+    }
+
+    private boolean isShould(Method method){
+        return method.getName().startsWith("should");
     }
 
     private void doBeforeCall(Method method, Object[] args) {

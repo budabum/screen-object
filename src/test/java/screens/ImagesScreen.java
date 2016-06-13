@@ -9,8 +9,8 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
 
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$$;
-import static com.codeborne.selenide.Selenide.sleep;
 
 /**
  * @author Alexey Lyanguzov.
@@ -34,9 +34,13 @@ public class ImagesScreen extends BaseScreen<ImagesScreen> implements Checker {
     }
 
     public ImagesScreen changeSize(String sizeName){
-        sizeChooserButton.click();
-        sleep(2000);
-        return this;
+        return action(a-> {
+            sizeChooserButton.shouldBe(visible);
+            sizeChooserButton.should(appear);
+            sizeChooserButton.shouldNotBe(hidden);
+            sizeChooserButton.click();
+//            sleep(2000);
+        });
     }
 
     /******** CHECKS *********/

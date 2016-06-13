@@ -39,7 +39,7 @@ public class SampleTest1 {
     @Test
     public void dummyTest(){}
 
-    @Test(enabled = !false)
+    @Test(enabled = false)
     public void testSearchText(){
         String phrase = "something";
         String phrase2 = "anything";
