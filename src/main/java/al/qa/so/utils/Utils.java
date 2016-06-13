@@ -14,7 +14,11 @@ import java.net.URISyntaxException;
 public class Utils {
 
     public static Logger getLogger(){
-        String loggerName = Thread.currentThread().getStackTrace()[2].getClassName();
+        return getLogger(3);
+    }
+
+    public static Logger getLogger(int backtrace){
+        String loggerName = Thread.currentThread().getStackTrace()[backtrace].getClassName();
         return LoggerFactory.getLogger(loggerName);
     }
 

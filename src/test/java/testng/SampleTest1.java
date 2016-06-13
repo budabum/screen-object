@@ -2,6 +2,8 @@ package testng;
 
 import al.qa.so.SO;
 import com.codeborne.selenide.Configuration;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import screens.TestScreens;
@@ -24,7 +26,20 @@ public class SampleTest1 {
         SO.addScreens(TestScreens.class);
     }
 
+    @BeforeMethod
+    private void initStepRecorder(){
+        SO.getStepRecorder().init();
+    }
+
+    @AfterMethod
+    private void printRecordedSteps(){
+        SO.getStepRecorder().printSteps();
+    }
+
     @Test
+    public void dummyTest(){}
+
+    @Test(enabled = !false)
     public void testSearchText(){
         String phrase = "something";
         String phrase2 = "anything";
@@ -42,7 +57,7 @@ public class SampleTest1 {
             });
     }
 
-    @Test
+    @Test(enabled = !false)
     public void testSearchImages(){
         String phrase = "table";
         navigateTo(IMAGES_SCREEN)

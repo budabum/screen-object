@@ -19,6 +19,7 @@ class Manager {
 
     private static final List<Class<? extends BaseScreen>> screens = new ArrayList<>();
     private static BaseScreen currentScreen = DefaultScreen.INSTANCE;
+    private static final StepRecorder stepRecorder = new StepRecorder();
 
     private static final Map<SelenideElement, String> fieldNames = new HashMap<>();
 
@@ -40,10 +41,15 @@ class Manager {
         return (T)currentScreen;
     }
 
+    static StepRecorder getStepRecorder(){
+        return stepRecorder;
+    }
+
     private static <T extends BaseScreen> T setCurrentScreen(T newCurrentScreen){
         currentScreen = newCurrentScreen;
         LOG.info("Setting current screen => {}", currentScreen.name());
         setFieldNames();
+        stepRecorder.onScreen("On screen %s", currentScreen.name());
         return getCurrentScreen();
     }
 
@@ -52,10 +58,8 @@ class Manager {
         T targetScreen;
         String targetScreenName = getName(targetScreenClass);
         LOG.info("Navigating from {} to {}", getCurrentScreen().name(), targetScreenName);
-        StepRecorder.onScreen(targetScreenName);
         if(isOnScreen(targetScreenName)){
             LOG.debug("Screen {} is already opened", targetScreenName);
-//            return instantiateScreen((Class<T>)getCurrentScreen().getClass());
             return (T)currentScreen;
         }
         else if(forceNavigation){
@@ -73,7 +77,7 @@ class Manager {
     @SuppressWarnings("unchecked")
     static <T, R extends BaseScreen> R doAction(Consumer<T> proc, T argument) {
         String actionName = getMethodName();
-        LOG.info("Doing action {} on {}", actionName, currentScreen.name());
+        stepRecorder.actionCall("Do action %s on %s", actionName, currentScreen.name());
         proc.accept(argument);
         return getCurrentScreen();
     }
@@ -81,7 +85,7 @@ class Manager {
     @SuppressWarnings("unchecked")
     static <T, R extends BaseScreen> R doCheck(Consumer<T> proc, T argument) {
         String checkName = getMethodName();
-        LOG.info("Doing check {} on {}", checkName, currentScreen.name());
+        stepRecorder.performCheck("Do check %s on %s", checkName, currentScreen.name());
         proc.accept(argument);
         return getCurrentScreen();
     }
@@ -90,8 +94,9 @@ class Manager {
     static <T, R extends BaseScreen> R doTransition(Consumer<T> proc, T argument) {
         String transitionName = getMethodName();
         R targetScreen = getTargetScreen(transitionName);
-        LOG.info("Doing transition '{}' from {} to {}", transitionName, currentScreen.name(), targetScreen.name());
+        stepRecorder.actionCall("Doing transition '%s' from %s", transitionName, currentScreen.name());
         proc.accept(argument);
+        stepRecorder.actionCall(" ... expecting to be on %s", targetScreen.name());
         if(!targetScreen.isOpened()){
             throw new ScreenObjectException("Screen %s is not opened. Current screen is %s",
                     targetScreen.name(), currentScreen.name());
