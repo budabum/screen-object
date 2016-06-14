@@ -11,34 +11,42 @@ import java.util.stream.Stream;
 public class StepRecorder {
     @SuppressWarnings("all")
     private final String SCREEN_CHANGE = " ";
+    @SuppressWarnings("all")
     private final String ACTION_CALL = "   ";
     @SuppressWarnings("all")
     private final String DRIVER_INTERACTION = "     ";
+
+    private boolean doAdd = true;
 
     private final List<String[]> steps = new ArrayList<>();
 
     public void init(){
         steps.clear();
+        setDoAdd(true);
+    }
+
+    public void setDoAdd(boolean doAdd) {
+        this.doAdd = doAdd;
     }
 
     public void onScreen(String msg, Object...args){
-        steps.add(new String[]{SCREEN_CHANGE, String.format(msg, args)});
+        addStep(SCREEN_CHANGE, msg, args);
     }
 
     public void actionCall(String msg, Object...args){
         String message = String.format(msg, args);
         Utils.getLogger().info(message);
-        steps.add(new String[]{ACTION_CALL, message});
+        addStep(DRIVER_INTERACTION, msg, args);
     }
 
     public void performCheck(String msg, Object...args){
         String message = String.format(msg, args);
         Utils.getLogger().info(message);
-        steps.add(new String[]{ACTION_CALL, message});
+        addStep(ACTION_CALL, msg, args);
     }
 
     public void driverInteraction(String msg, Object...args){
-        steps.add(new String[]{DRIVER_INTERACTION, String.format(msg, args)});
+        addStep(DRIVER_INTERACTION, msg, args);
     }
 
     public void printSteps(){
@@ -51,6 +59,12 @@ public class StepRecorder {
         steps.stream().forEach(s -> sb.append(" # ").append(s[0]).append(s[1]).append("\n"));
         IntStream.range(1, 21).forEach(i -> sb.append("=#="));
         System.out.println(sb.toString());
+    }
+
+    private void addStep(String indent, String msg, Object...args){
+        if(doAdd){
+            steps.add(new String[]{indent, String.format(msg, args)});
+        }
     }
 
 }

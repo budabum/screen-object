@@ -29,6 +29,7 @@ public class SearchResultsScreen extends BaseScreen<SearchResultsScreen> impleme
     private SelenideElement findButton = by.xpath("//button[contains(@class,'suggest2-form')]");
 
 //    ElementsCollection resultTexts = $$(By.xpath(RESULTS_LIST_XPATH + "//div[@class='text organic__text']"));
+    ElementsCollection resultTexts = $$(By.xpath(RESULTS_LIST_XPATH + "//div[@class='text organic__text']"));
 
 
     /******** ACTIONS *********/
@@ -44,14 +45,12 @@ public class SearchResultsScreen extends BaseScreen<SearchResultsScreen> impleme
 
     public SearchResultsScreen returnedResultsCount(int size){
         return check(c -> {
-            ElementsCollection resultTexts = $$(By.xpath(RESULTS_LIST_XPATH + "//div[@class='text organic__text']"));
             resultTexts.shouldHaveSize(size);
         });
     }
 
     public SearchResultsScreen allSearchResultContains(String phrase){
         return check(c->{
-            ElementsCollection resultTexts = $$(By.xpath(RESULTS_LIST_XPATH + "//div[@class='text organic__text']"));
             resultTexts.stream().forEach(p -> {
                 p.should(Condition.matchText("(?i)"+phrase));
             });

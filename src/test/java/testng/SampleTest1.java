@@ -21,6 +21,7 @@ public class SampleTest1 {
     private void before1(){
         Configuration.baseUrl = "";
         Configuration.browser = "chrome";
+        Configuration.browserSize = "1280x800";
         Configuration.screenshots = false;
 
         SO.addScreens(TestScreens.class);
@@ -39,7 +40,7 @@ public class SampleTest1 {
     @Test
     public void dummyTest(){}
 
-    @Test(enabled = false)
+    @Test(enabled = !false)
     public void testSearchText(){
         String phrase = "something";
         String phrase2 = "anything";

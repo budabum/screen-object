@@ -1,6 +1,5 @@
-package al.qa.so.selenium;
+package al.qa.so.selenide;
 
-import al.qa.so.selenide.SOElementProxy;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
 

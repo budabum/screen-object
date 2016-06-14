@@ -3,7 +3,7 @@ package al.qa.so;
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.anno.Trait;
 import al.qa.so.exc.ScreenObjectException;
-import al.qa.so.selenium.ByResolver;
+import al.qa.so.selenide.ByResolver;
 import al.qa.so.utils.Utils;
 import al.qa.so.utils.url.UriComparator;
 import al.qa.so.utils.url.UrlComparisonStrategy;
@@ -59,9 +59,12 @@ public abstract class BaseScreen<ScreenChecker extends Checker> {
     }
 
     boolean isOpened(boolean waitForProgress){
-        return waitForNoProgressIndicator(waitForProgress) &&
+        SO.getStepRecorder().setDoAdd(false);
+        boolean result = waitForNoProgressIndicator(waitForProgress) &&
                 waitForTraits() &&
                 isUrlCorrect();
+        SO.getStepRecorder().setDoAdd(true);
+        return result;
     }
 
     protected <T, R extends BaseScreen> R action(Consumer<T> proc){

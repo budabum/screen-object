@@ -85,7 +85,7 @@ class Manager {
     @SuppressWarnings("unchecked")
     static <T, R extends BaseScreen> R doCheck(Consumer<T> proc, T argument) {
         String checkName = getMethodName();
-        stepRecorder.performCheck("Do check %s(%s)", checkName, currentScreen.name());
+        stepRecorder.performCheck("Check %s(%s)", checkName, currentScreen.name());
         proc.accept(argument);
         return getCurrentScreen();
     }
