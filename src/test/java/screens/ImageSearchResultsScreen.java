@@ -8,6 +8,7 @@ import al.qa.so.utils.url.UriComparator;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.FindBy;
 
 import static com.codeborne.selenide.Condition.appear;
 import static com.codeborne.selenide.Condition.hidden;
@@ -17,16 +18,23 @@ import static com.codeborne.selenide.Selenide.$$;
 /**
  * @author Alexey Lyanguzov.
  */
+@SuppressWarnings("unused")
 @ScreenParams(
     urls = "https://yandex.ru/images/search",
-    urlComparisonStrategy = UriComparator.CompareWithoutQuery.class)
+    urlComparisonStrategy = UriComparator.CompareWithoutQuery.class
+)
 public class ImageSearchResultsScreen extends BaseScreen<ImageSearchResultsScreen> implements Checker {
     private static final String RESULTS_LIST_XPATH = "//div[contains(@class,'serp-list')]";
 
-    @Trait
-    private SelenideElement searchField = by.xpath("//input[@type='search']");
-    private SelenideElement findButton = by.xpath("//button[contains(@class,'suggest2-form')]");
-    private SelenideElement sizeChooserButton = by.xpath("//span[text()='Размер']/parent::node()");
+    @Trait @FindBy(xpath = "//input[@type='search']")
+    private SelenideElement searchField;
+
+    @FindBy(xpath = "//button[contains(@class,'suggest2-form')]")
+    private SelenideElement findButton;
+
+    @FindBy(xpath = "//span[text()='Размер']/parent::node()")
+    private SelenideElement sizeChooserButton;
+
 
     /******** TRANSITIONS *********/
 
@@ -36,6 +44,7 @@ public class ImageSearchResultsScreen extends BaseScreen<ImageSearchResultsScree
             findButton.click();
         });
     }
+
 
     /******** ACTIONS *********/
 
@@ -47,6 +56,7 @@ public class ImageSearchResultsScreen extends BaseScreen<ImageSearchResultsScree
             sizeChooserButton.click();
         });
     }
+
 
     /******** CHECKS *********/
 

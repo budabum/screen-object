@@ -5,6 +5,7 @@ import al.qa.so.anno.ScreenParams;
 import al.qa.so.anno.Trait;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.FindBy;
 
 import static com.codeborne.selenide.Selenide.$;
 
@@ -19,10 +20,11 @@ import static com.codeborne.selenide.Selenide.$;
         })
 public class MainScreen extends BaseScreen {
 
-    @Trait
-    private SelenideElement searchField = by.xpath("//input[@aria-label='Запрос']");
-    @Trait
-    private SelenideElement findButton = by.xpath("//button[contains(@class,'suggest2-form')]");
+    @Trait @FindBy(xpath = "//input[@aria-label='Запрос']")
+    private SelenideElement searchField;
+
+    @Trait @FindBy(xpath = "//button[contains(@class,'suggest2-form')]")
+    private SelenideElement findButton;
 
     public SearchResultsScreen search(String searchPhrase){
         return (SearchResultsScreen) transition(p->{

@@ -2,9 +2,14 @@ package al.qa.so;
 
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.exc.ScreenObjectException;
+import al.qa.so.selenide.AllByResolver;
+import al.qa.so.selenide.ByResolver;
 import al.qa.so.utils.StepRecorder;
 import al.qa.so.utils.Utils;
+import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Method;
@@ -175,9 +180,43 @@ class Manager {
 
     private static <T extends BaseScreen> T instantiateScreen(Class<T> screenClass) {
         try{
-            return screenClass.newInstance();
+            return initElements(screenClass.newInstance());
         } catch (InstantiationException | IllegalAccessException exc) {
             throw new ScreenObjectException(exc);
         }
+    }
+
+    private static <T extends BaseScreen> T initElements(T screenInstance){
+        LOG.trace("Will instantiate screen {}", screenInstance.name());
+        Arrays.stream(screenInstance.getClass().getDeclaredFields()).forEach(f -> {
+            f.setAccessible(true);
+            String fieldName = f.getName();
+            FindBy findBy = f.getAnnotation(FindBy.class); //TODO: cover FindAll etc
+            if(findBy == null){
+                LOG.trace("Skipping field {} due to it does not have @FindBy", fieldName);
+            }
+            else{
+                LOG.trace("Instantiating field {}", fieldName);
+                Class<?> type = f.getType();
+                try {
+                    if(WebElement.class.isAssignableFrom(type)){
+                        SelenideElement selenideElement = ByResolver.INSTANCE.resolve(f);
+                        f.set(screenInstance, selenideElement);
+                        LOG.trace("... OK: SelenideElement: {}", fieldName);
+                    }
+                    else if(type.isAssignableFrom(ElementsCollection.class)){
+                        ElementsCollection elementsCollection = AllByResolver.INSTANCE.resolve(f);
+                        f.set(screenInstance, elementsCollection);
+                        LOG.trace("... OK: ElementsCollection: {}", fieldName);
+                    }
+                    else {
+                        throw new ScreenObjectException("Unable to instantiate field with type: %s", type);
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new ScreenObjectException(e);
+                }
+            }
+        });
+        return screenInstance;
     }
 }

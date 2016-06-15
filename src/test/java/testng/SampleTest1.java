@@ -37,10 +37,10 @@ public class SampleTest1 {
         SO.getStepRecorder().printSteps();
     }
 
-    @Test
+    @Test(enabled = false)
     public void dummyTest(){}
 
-    @Test(enabled = false)
+    @Test(enabled = !false)
     public void testSearchText(){
         String phrase = "something";
         String phrase2 = "anything";
