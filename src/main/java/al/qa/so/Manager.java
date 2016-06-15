@@ -1,12 +1,13 @@
 package al.qa.so;
 
 import al.qa.so.anno.ScreenParams;
-import al.qa.so.exc.ScreenObjectException;
+import al.qa.so.exc.SOException;
 import al.qa.so.selenide.AllByResolver;
 import al.qa.so.selenide.ByResolver;
 import al.qa.so.utils.StepRecorder;
 import al.qa.so.utils.Utils;
 import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.ElementsContainer;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -77,7 +78,7 @@ class Manager {
             String msg = targetScreenName.equals(currentScreen.name()) ?
                 String.format("Target screen %s not actually opened", targetScreenName) :
                 String.format("Expected to be on %s but actually on %s", targetScreenName, currentScreen.name());
-            throw new ScreenObjectException(msg);
+            throw new SOException(msg);
         }
         return setCurrentScreen(targetScreen);
     }
@@ -106,7 +107,7 @@ class Manager {
         proc.accept(argument);
         stepRecorder.actionCall(" ... expecting to be on %s", targetScreen.name());
         if(!targetScreen.isOpened()){
-            throw new ScreenObjectException("Screen %s is not opened. Current screen is %s",
+            throw new SOException("Screen %s is not opened. Current screen is %s",
                     targetScreen.name(), currentScreen.name());
         }
         LOG.trace("Transition is done");
@@ -130,7 +131,7 @@ class Manager {
     private static <T extends BaseScreen> String getName(Class<T> screenClass){
         String name = screenClass.getSimpleName();
         if(!screens.contains(screenClass)){
-            throw new ScreenObjectException("Screen "+ name +" is not registered");
+            throw new SOException("Screen "+ name +" is not registered");
         }
         return name;
     }
@@ -140,15 +141,35 @@ class Manager {
         LOG.trace("Checking screen class: {}", className);
         ScreenParams[] urls = screen.getAnnotationsByType(ScreenParams.class);
         if(urls == null || urls.length == 0) {
-            throw new ScreenObjectException("Class "+ className +" has no url! Set annotation @ScreenParams.");
+            throw new SOException("Class "+ className +" has no url! Set annotation @ScreenParams.");
         }
     }
 
     private static Method getMethod(String methodName){
-        Method[] methods = getCurrentScreen().getClass().getMethods();
-        Method meth = Arrays.stream(methods).filter(m -> m.getName().equals(methodName)).findFirst().orElseGet(null);
+        LOG.trace("Looking for method {}", methodName);
+        Method meth = findMethod(methodName, currentScreen);
+        if(meth == null){
+            Iterator it = currentScreen.getContainers().iterator();
+            while(meth == null && it.hasNext()){
+                ElementsContainer container = (ElementsContainer)it.next();
+                meth = findMethod(methodName, container);
+            }
+        }
+        if(meth == null){
+            throw new SOException("Unable to find method {} on screen {} and its parts", methodName, currentScreen.name());
+        }
         LOG.trace("Found method {}", meth);
         return meth;
+    }
+
+    private static Method findMethod(String methodName, Object obj){
+        Method[] methods = obj.getClass().getMethods();
+        for(Method m : methods){
+            if(m.getName().equals(methodName)){
+                return m;
+            }
+        }
+        return null;
     }
 
     private static String getMethodName() {
@@ -173,7 +194,7 @@ class Manager {
         T screenInstance = instantiateScreen(screenClass);
         screenInstance._open();
         if(!screenInstance.isOpened()){
-            throw new ScreenObjectException("Screen " + screenName + " is not opened!");
+            throw new SOException("Screen " + screenName + " is not opened!");
         }
         return screenInstance;
     }
@@ -182,13 +203,18 @@ class Manager {
         try{
             return initElements(screenClass.newInstance());
         } catch (InstantiationException | IllegalAccessException exc) {
-            throw new ScreenObjectException(exc);
+            throw new SOException(exc);
         }
     }
 
-    private static <T extends BaseScreen> T initElements(T screenInstance){
-        LOG.trace("Will instantiate screen {}", screenInstance.name());
-        Arrays.stream(screenInstance.getClass().getDeclaredFields()).forEach(f -> {
+    private static <T extends ScreenPart> T initElements(T screenPart){
+        return initElements(screenPart, (BaseScreen)screenPart);
+    }
+
+    private static <T extends ScreenPart> T initElements(T screenPart, BaseScreen parentScreen){
+        String screenPartTypeName = (BaseScreen.class.isAssignableFrom(screenPart.getClass())) ? "screen" : "module";
+        LOG.trace("Will instantiate {} {}", screenPartTypeName, screenPart.name());
+        Arrays.stream(screenPart.getClass().getDeclaredFields()).forEach(f -> {
             f.setAccessible(true);
             String fieldName = f.getName();
             FindBy findBy = f.getAnnotation(FindBy.class); //TODO: cover FindAll etc
@@ -201,22 +227,30 @@ class Manager {
                 try {
                     if(WebElement.class.isAssignableFrom(type)){
                         SelenideElement selenideElement = ByResolver.INSTANCE.resolve(f);
-                        f.set(screenInstance, selenideElement);
+                        f.set(screenPart, selenideElement);
                         LOG.trace("... OK: SelenideElement: {}", fieldName);
                     }
                     else if(type.isAssignableFrom(ElementsCollection.class)){
                         ElementsCollection elementsCollection = AllByResolver.INSTANCE.resolve(f);
-                        f.set(screenInstance, elementsCollection);
+                        f.set(screenPart, elementsCollection);
                         LOG.trace("... OK: ElementsCollection: {}", fieldName);
                     }
-                    else {
-                        throw new ScreenObjectException("Unable to instantiate field with type: %s", type);
+                    else if(ElementsContainer.class.isAssignableFrom(type)){
+                        ElementsContainer container = (ElementsContainer) f.getType().newInstance();
+                        container.setSelf(ByResolver.INSTANCE.resolve(f));
+                        f.set(screenPart, container);
+                        initElements((ScreenPart) container, parentScreen);
+                        parentScreen.addContainer(container);
+                        LOG.trace("... OK: ElementsContainer: {}", fieldName);
                     }
-                } catch (IllegalAccessException e) {
-                    throw new ScreenObjectException(e);
+                    else {
+                        throw new SOException("Unable to instantiate field with type: %s", type);
+                    }
+                } catch (IllegalAccessException | InstantiationException e) {
+                    throw new SOException(e);
                 }
             }
         });
-        return screenInstance;
+        return screenPart;
     }
 }

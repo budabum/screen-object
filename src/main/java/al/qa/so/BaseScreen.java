@@ -2,13 +2,14 @@ package al.qa.so;
 
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.anno.Trait;
-import al.qa.so.exc.ScreenObjectException;
+import al.qa.so.exc.SOException;
 import al.qa.so.selenide.AllByResolver;
 import al.qa.so.selenide.ByResolver;
 import al.qa.so.utils.Utils;
 import al.qa.so.utils.url.UriComparator;
 import al.qa.so.utils.url.UrlComparisonStrategy;
 import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.ElementsContainer;
 import com.codeborne.selenide.SelenideElement;
 import org.slf4j.Logger;
 
@@ -25,7 +26,7 @@ import static com.codeborne.selenide.WebDriverRunner.url;
 /**
  * @author Alexey Lyanguzov.
  */
-public abstract class BaseScreen<ScreenChecker extends Checker> {
+public abstract class BaseScreen<ScreenChecker extends Checker> implements ScreenPart {
     protected final ByResolver by = ByResolver.INSTANCE;
     protected final AllByResolver allby = AllByResolver.INSTANCE;
 
@@ -34,6 +35,7 @@ public abstract class BaseScreen<ScreenChecker extends Checker> {
     private final List<URI> uris = new ArrayList<>();
     private final Class<? extends UrlComparisonStrategy> urlComparisonStrategy;
     private final List<Field> traits = new ArrayList<>();
+    private final List<ElementsContainer> containers = new ArrayList<>();
 
     public BaseScreen() {
         ScreenParams params = this.getClass().getAnnotation(ScreenParams.class);
@@ -52,10 +54,6 @@ public abstract class BaseScreen<ScreenChecker extends Checker> {
         return (T)this;
     }
 
-    public String name(){
-        return this.getClass().getSimpleName();
-    }
-
     boolean isOpened(){
         return isOpened(true);
     }
@@ -69,35 +67,16 @@ public abstract class BaseScreen<ScreenChecker extends Checker> {
         return result;
     }
 
-    protected <T, R extends BaseScreen> R action(Consumer<T> proc){
-        return action(proc, null);
-    }
-
-    @SuppressWarnings("all")
-    protected <T, R extends BaseScreen> R action(Consumer<T> proc, T argument){
-        return Manager.doAction(proc, argument);
-    }
-
-    protected <T, R extends BaseScreen> R transition(Consumer<T> proc){
-        return (R)transition(proc, null);
-    }
-
-    @SuppressWarnings("all")
-    protected <T, R extends BaseScreen> R transition(Consumer<T> proc, T argument){
-        return (R)Manager.doTransition(proc, argument);
-    }
-
-    protected <T, R extends BaseScreen> R check(Consumer<T> proc){
-        return check(proc, null);
-    }
-
-    @SuppressWarnings("all")
-    protected <T, R extends BaseScreen> R check(Consumer<T> proc, T argument){
-        return Manager.doCheck(proc, argument);
-    }
-
     void _open(){
         directOpen();
+    }
+
+    void addContainer(ElementsContainer container){
+        containers.add(container);
+    }
+
+    List<ElementsContainer> getContainers() {
+        return containers;
     }
 
     private void directOpen(){
@@ -136,24 +115,38 @@ public abstract class BaseScreen<ScreenChecker extends Checker> {
 
     private boolean waitForTraits(){
         if(traits.isEmpty()){
-            throw new ScreenObjectException("Screen %s does not have trait elements", name());
+            throw new SOException("Screen %s does not have trait elements", name());
         }
         for(Field traitField : traits){
-            SelenideElement trait;
-            try {
-                traitField.setAccessible(true);
-                trait = (SelenideElement) traitField.get(this);
-            } catch (IllegalAccessException e) {
-                throw new ScreenObjectException(e);
-            }
+            traitField.setAccessible(true);
+            SelenideElement trait = getTrait(traitField);
+            LOG.debug("Waitinh for trait: {}", traitField.getName());
             trait.shouldBe(visible);
         }
         return true;
     }
 
+    private SelenideElement getTrait(Field traitField){
+        try {
+            Object obj = traitField.get(this);
+            Class<?> classType = obj.getClass();
+            if(SelenideElement.class.isAssignableFrom(classType)){
+                return (SelenideElement) obj;
+            }
+            else if(ElementsContainer.class.isAssignableFrom(classType)){
+                return ((ElementsContainer) obj).getSelf();
+            }
+            else{
+                throw new SOException("Unknown class type of trait: %s", classType.getName());
+            }
+        } catch (IllegalAccessException e) {
+            throw new SOException(e);
+        }
+    }
+
     private URI mainUrl(){
         if(uris.isEmpty() || uris.get(0) == null){
-            throw new ScreenObjectException("Url is not set for the screen %s", name());
+            throw new SOException("Url is not set for the screen %s", name());
         }
         return uris.get(0);
     }

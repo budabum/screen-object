@@ -7,6 +7,7 @@ import al.qa.so.anno.Trait;
 import al.qa.so.utils.url.UriComparator;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import modules.ImageSearchModule;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
@@ -26,24 +27,12 @@ import static com.codeborne.selenide.Selenide.$$;
 public class ImageSearchResultsScreen extends BaseScreen<ImageSearchResultsScreen> implements Checker {
     private static final String RESULTS_LIST_XPATH = "//div[contains(@class,'serp-list')]";
 
-    @Trait @FindBy(xpath = "//input[@type='search']")
-    private SelenideElement searchField;
-
-    @FindBy(xpath = "//button[contains(@class,'suggest2-form')]")
-    private SelenideElement findButton;
+    @Trait
+    @FindBy(xpath = "//span[@class='service__name' and text()='Картинки']")
+    public ImageSearchModule searchModule;
 
     @FindBy(xpath = "//span[text()='Размер']/parent::node()")
     private SelenideElement sizeChooserButton;
-
-
-    /******** TRANSITIONS *********/
-
-    public ImageSearchResultsScreen search(String searchPhrase){
-        return transition(p->{
-            searchField.setValue(searchPhrase);
-            findButton.click();
-        });
-    }
 
 
     /******** ACTIONS *********/

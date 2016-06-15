@@ -1,6 +1,6 @@
 package al.qa.so.utils;
 
-import al.qa.so.exc.ScreenObjectException;
+import al.qa.so.exc.SOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ public class Utils {
         try {
             return new URI(strUri);
         } catch (URISyntaxException e) {
-            throw new ScreenObjectException(e);
+            throw new SOException(e);
         }
     }
 
@@ -34,7 +34,7 @@ public class Utils {
         try {
             return field.get(null);
         } catch (IllegalAccessException e) {
-            throw new ScreenObjectException(e);
+            throw new SOException(e);
         }
     }
 

@@ -62,12 +62,12 @@ public class SampleTest1 {
     public void testSearchImages(){
         String phrase = "table";
         navigateTo(IMAGES_SCREEN)
-            .search(phrase)
+            .searchModule.search(phrase)
             .ensure(c->{c
                 .returnedResultsCount(295);
             });
         onScreen(IMAGE_SEARCH_RESULTS_SCREEN)
-            .search("chair")
+            .searchModule.search("chair")
             .changeSizeTo("Маленький");
     }
 

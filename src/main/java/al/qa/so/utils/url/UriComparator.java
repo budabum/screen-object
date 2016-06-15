@@ -1,6 +1,6 @@
 package al.qa.so.utils.url;
 
-import al.qa.so.exc.ScreenObjectException;
+import al.qa.so.exc.SOException;
 import al.qa.so.utils.Utils;
 import org.slf4j.Logger;
 
@@ -48,7 +48,7 @@ public class UriComparator {
             try {
                 partValue = String.valueOf(uri.getClass().getMethod(methodName).invoke(uri));
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                throw new ScreenObjectException(e);
+                throw new SOException(e);
             }
             urlParts.put(p, partValue);
         });
