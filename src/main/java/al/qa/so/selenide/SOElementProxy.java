@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,7 @@ import static com.codeborne.selenide.Selenide.$;
 /**
  * @author Alexey Lyanguzov.
  */
-public class SOElementProxy implements InvocationHandler {
+class SOElementProxy implements InvocationHandler {
     private static final Logger LOG = Utils.getLogger();
     private static final List<String> WEBDRIVER_INTERACTION = Stream.of(
         "click", "setValue", "val", "followLink"
@@ -32,16 +33,28 @@ public class SOElementProxy implements InvocationHandler {
         put("setValue", "Setting value %s in");
     }};
 
-    private final By by;
+    private final By by; // for SelenideElement
+    private final SelenideElement origElement; //for ElementsCollection
     private SelenideElement realSelenideElement;
+    private boolean isElementcollectionProxy = false;
 
-    public SOElementProxy(By by) {
+    SOElementProxy(By by) {
+        this(by, null);
+    }
+
+    SOElementProxy(SelenideElement element) {
+        this(null, element);
+        isElementcollectionProxy = true;
+    }
+
+    private SOElementProxy(By by, SelenideElement origElement) {
         this.by = by;
+        this.origElement = origElement;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if(realSelenideElement == null) init();
+        init();
         doBeforeCall(method, args);
         Object res = method.invoke(realSelenideElement, args);
         doAfterCall(method, args);
@@ -62,7 +75,14 @@ public class SOElementProxy implements InvocationHandler {
     }
 
     private void init(){
-        this.realSelenideElement = $(by);
+        if(realSelenideElement == null){
+            if(isElementcollectionProxy){
+                realSelenideElement = origElement;
+            }
+            else{
+                realSelenideElement = $(by);
+            }
+        }
     }
 
     private void reportWebDriverInteraction(Method method, Object[] args) {

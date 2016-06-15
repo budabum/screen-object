@@ -48,7 +48,7 @@ public class ByResolver {
 
     private SelenideElement createSelenideElement(By by){
         return (SelenideElement) Proxy.newProxyInstance(
-                this.getClass().getClassLoader(),
+                SelenideElement.class.getClassLoader(),
                 new Class<?>[]{SelenideElement.class},
                 new SOElementProxy(by)
         );

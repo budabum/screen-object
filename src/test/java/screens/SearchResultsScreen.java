@@ -29,7 +29,7 @@ public class SearchResultsScreen extends BaseScreen<SearchResultsScreen> impleme
     private SelenideElement findButton = by.xpath("//button[contains(@class,'suggest2-form')]");
 
 //    ElementsCollection resultTexts = $$(By.xpath(RESULTS_LIST_XPATH + "//div[@class='text organic__text']"));
-    ElementsCollection resultTexts = $$(By.xpath(RESULTS_LIST_XPATH + "//div[@class='text organic__text']"));
+    private ElementsCollection resultTexts = allby.xpath(RESULTS_LIST_XPATH + "//div[@class='text organic__text']");
 
 
     /******** ACTIONS *********/

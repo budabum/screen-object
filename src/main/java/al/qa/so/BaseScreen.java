@@ -3,6 +3,7 @@ package al.qa.so;
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.anno.Trait;
 import al.qa.so.exc.ScreenObjectException;
+import al.qa.so.selenide.AllByResolver;
 import al.qa.so.selenide.ByResolver;
 import al.qa.so.utils.Utils;
 import al.qa.so.utils.url.UriComparator;
@@ -26,6 +27,7 @@ import static com.codeborne.selenide.WebDriverRunner.url;
  */
 public abstract class BaseScreen<ScreenChecker extends Checker> {
     protected final ByResolver by = ByResolver.INSTANCE;
+    protected final AllByResolver allby = AllByResolver.INSTANCE;
 
     private static final Logger LOG = Utils.getLogger();
 

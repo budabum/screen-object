@@ -32,7 +32,7 @@ class Manager {
 
     static String getFieldName(SelenideElement key){
         String name = fieldNames.get(key);
-        LOG.trace("Found field name: {} for key {}", name, key);
+        LOG.trace("Found field name: {} for key {}", name, key.hashCode());
         return name;
     }
 
@@ -85,7 +85,7 @@ class Manager {
     @SuppressWarnings("unchecked")
     static <T, R extends BaseScreen> R doCheck(Consumer<T> proc, T argument) {
         String checkName = getMethodName();
-        stepRecorder.performCheck("Check %s(%s)", checkName, currentScreen.name());
+        stepRecorder.performCheck("Check %s", checkName);
         proc.accept(argument);
         return getCurrentScreen();
     }
