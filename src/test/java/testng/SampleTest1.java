@@ -40,7 +40,7 @@ public class SampleTest1 {
     @Test
     public void dummyTest(){}
 
-    @Test(enabled = !false)
+    @Test(enabled = false)
     public void testSearchText(){
         String phrase = "something";
         String phrase2 = "anything";
@@ -66,8 +66,9 @@ public class SampleTest1 {
             .ensure(c->{c
                 .returnedResultsCount(295);
             });
-        onScreen(IMAGES_SCREEN)
-            .changeSize("Маленький");
+        onScreen(IMAGE_SEARCH_RESULTS_SCREEN)
+            .search("chair")
+            .changeSizeTo("Маленький");
     }
 
 }

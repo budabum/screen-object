@@ -30,7 +30,7 @@ class SOElementProxy implements InvocationHandler {
 
     private static final Map<String, String> HUMANIZE = new HashMap<String, String>(){{
         put("click", "Click%s on");
-        put("setValue", "Setting value %s in");
+        put("setValue", "Set value %s in");
     }};
 
     private final By by; // for SelenideElement

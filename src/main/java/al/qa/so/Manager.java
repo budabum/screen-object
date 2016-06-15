@@ -46,10 +46,13 @@ class Manager {
     }
 
     private static <T extends BaseScreen> T setCurrentScreen(T newCurrentScreen){
+        BaseScreen oldCurrentScreen = currentScreen;
         currentScreen = newCurrentScreen;
         LOG.info("Setting current screen => {}", currentScreen.name());
         setFieldNames();
-        stepRecorder.onScreen("On screen %s", currentScreen.name());
+        if(!oldCurrentScreen.name().equals(newCurrentScreen.name())){
+            stepRecorder.onScreen("On screen %s", currentScreen.name());
+        }
         return getCurrentScreen();
     }
 

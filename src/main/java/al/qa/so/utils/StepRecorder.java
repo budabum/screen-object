@@ -36,7 +36,7 @@ public class StepRecorder {
     public void actionCall(String msg, Object...args){
         String message = String.format(msg, args);
         Utils.getLogger().info(message);
-        addStep(DRIVER_INTERACTION, msg, args);
+        addStep(ACTION_CALL, msg, args);
     }
 
     public void performCheck(String msg, Object...args){
