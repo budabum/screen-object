@@ -1,5 +1,7 @@
 package screens;
 
+import al.qa.so.ActAs;
+import al.qa.so.ActionType;
 import al.qa.so.BaseScreen;
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.anno.Trait;
@@ -26,8 +28,9 @@ public class MainScreen extends BaseScreen {
     @Trait @FindBy(xpath = "//button[contains(@class,'suggest2-form')]")
     private SelenideElement findButton;
 
+    @ActionType(ActAs.Transition)
     public SearchResultsScreen search(String searchPhrase){
-        return (SearchResultsScreen) transition(p->{
+        return perform(p->{
             searchField.setValue(searchPhrase);
             findButton.click();
         });

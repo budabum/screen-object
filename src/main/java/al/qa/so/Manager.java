@@ -84,26 +84,44 @@ class Manager {
     }
 
     @SuppressWarnings("unchecked")
-    static <T, R extends BaseScreen> R doAction(Consumer<T> proc, T argument) {
-        String actionName = getMethodName();
+    static <T, R extends BaseScreen> R perform(Consumer<T> proc, T argument) {
+        String methodName = getMethodName();
+        Method method = getMethod(methodName);
+        ActionType actionType = method.getAnnotation(ActionType.class);
+        if(actionType == null){
+            throw new SOException("Trying to perform action %s on screen %s which misses annotation @%s",
+                methodName, currentScreen.name(), ActionType.class.getSimpleName());
+        }
+        ActAs actAs = actionType.value();
+        switch(actAs){
+            case Action:
+                return doAction(methodName, proc, argument);
+            case Check:
+                return doCheck(methodName, proc, argument);
+            case Transition:
+                return doTransition(methodName, proc, argument);
+        }
+        throw new SOException("Unexpected call of perform for %s", methodName);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T, R extends BaseScreen> R doAction(String actionName, Consumer<T> proc, T argument) {
         stepRecorder.actionCall("Do action %s(%s)", actionName, currentScreen.name());
         proc.accept(argument);
         return getCurrentScreen();
     }
 
     @SuppressWarnings("unchecked")
-    static <T, R extends BaseScreen> R doCheck(Consumer<T> proc, T argument) {
-        String checkName = getMethodName();
+    private static <T, R extends BaseScreen> R doCheck(String checkName, Consumer<T> proc, T argument) {
         stepRecorder.performCheck("Check %s", checkName);
         proc.accept(argument);
         return getCurrentScreen();
     }
 
     @SuppressWarnings("unchecked")
-    static <T, R extends BaseScreen> R doTransition(Consumer<T> proc, T argument) {
-        String transitionName = getMethodName();
+    private static <T, R extends BaseScreen> R doTransition(String transitionName, Consumer<T> proc, T argument) {
         R targetScreen = getTargetScreen(transitionName);
-        stepRecorder.actionCall("Doing transition '%s' from %s", transitionName, currentScreen.name());
+        stepRecorder.actionCall("Do transition '%s' from %s", transitionName, currentScreen.name());
         proc.accept(argument);
         stepRecorder.actionCall(" ... expecting to be on %s", targetScreen.name());
         if(!targetScreen.isOpened()){

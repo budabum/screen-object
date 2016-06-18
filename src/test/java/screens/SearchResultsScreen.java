@@ -1,5 +1,7 @@
 package screens;
 
+import al.qa.so.ActAs;
+import al.qa.so.ActionType;
 import al.qa.so.BaseScreen;
 import al.qa.so.Checker;
 import al.qa.so.anno.ScreenParams;
@@ -35,10 +37,11 @@ public class SearchResultsScreen extends BaseScreen<SearchResultsScreen> impleme
     private ElementsCollection resultTexts = allby.xpath(RESULTS_LIST_XPATH + "//div[@class='text organic__text']");
 
 
-    /******** ACTIONS *********/
+    /******** TRANSITIONS *********/
 
+    @ActionType(ActAs.Transition)
     public SearchResultsScreen search(String searchPhrase){
-        return transition(p->{
+        return perform(p->{
             searchField.setValue(searchPhrase);
             findButton.click();
         });
@@ -46,12 +49,14 @@ public class SearchResultsScreen extends BaseScreen<SearchResultsScreen> impleme
 
     /******** CHECKS *********/
 
+    @ActionType(ActAs.Check)
     public SearchResultsScreen returnedResultsCount(int size){
-        return check(c -> resultTexts.shouldHaveSize(size));
+        return perform(c -> resultTexts.shouldHaveSize(size));
     }
 
+    @ActionType(ActAs.Check)
     public SearchResultsScreen allSearchResultContains(String phrase){
-        return check(c->{
+        return perform(c->{
             resultTexts.stream().forEach(p -> p.should(Condition.matchText("(?i)"+phrase)));
         });
     }

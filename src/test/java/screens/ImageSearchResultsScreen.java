@@ -1,10 +1,13 @@
 package screens;
 
+import al.qa.so.ActionType;
 import al.qa.so.BaseScreen;
 import al.qa.so.Checker;
+import al.qa.so.ActAs;
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.anno.Trait;
 import al.qa.so.utils.url.UriComparator;
+import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import modules.ImageSearchModule;
@@ -37,8 +40,9 @@ public class ImageSearchResultsScreen extends BaseScreen<ImageSearchResultsScree
 
     /******** ACTIONS *********/
 
+    @ActionType(ActAs.Action)
     public ImageSearchResultsScreen changeSizeTo(String sizeName){
-        return action(a-> {
+        return perform(a-> {
             sizeChooserButton.shouldBe(visible);
             sizeChooserButton.should(appear);
             sizeChooserButton.shouldNotBe(hidden);
@@ -49,10 +53,11 @@ public class ImageSearchResultsScreen extends BaseScreen<ImageSearchResultsScree
 
     /******** CHECKS *********/
 
+    @ActionType(ActAs.Check)
     public ImageSearchResultsScreen returnedResultsCount(int size){
-        return check(c -> {
+        return perform(c -> {
             ElementsCollection resultTexts = $$(By.xpath(RESULTS_LIST_XPATH + "//div[contains(@class, 'serp-item')]"));
-            resultTexts.shouldHaveSize(size);
+            resultTexts.shouldHave(CollectionCondition.sizeGreaterThanOrEqual(size));
         });
     }
 }

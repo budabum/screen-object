@@ -64,7 +64,7 @@ public class SampleTest1 {
         navigateTo(IMAGES_SCREEN)
             .searchModule.search(phrase)
             .ensure(c->{c
-                .returnedResultsCount(295);
+                .returnedResultsCount(290);
             });
         onScreen(IMAGE_SEARCH_RESULTS_SCREEN)
             .searchModule.search("chair")

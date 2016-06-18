@@ -1,5 +1,7 @@
 package modules;
 
+import al.qa.so.ActAs;
+import al.qa.so.ActionType;
 import al.qa.so.ScreenPart;
 import al.qa.so.anno.Trait;
 import com.codeborne.selenide.ElementsContainer;
@@ -18,8 +20,9 @@ public class ImageSearchModule extends ElementsContainer implements ScreenPart {
     @FindBy(xpath = "//button[contains(@class,'suggest2-form')]")
     private SelenideElement findButton;
 
+    @ActionType(ActAs.Transition)
     public ImageSearchResultsScreen search(String searchPhrase){
-        return transition(p->{
+        return perform(p->{
             searchField.setValue(searchPhrase);
             findButton.click();
         });
