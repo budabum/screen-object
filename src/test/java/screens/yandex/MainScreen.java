@@ -1,4 +1,4 @@
-package screens;
+package screens.yandex;
 
 import al.qa.so.ActAs;
 import al.qa.so.ActionType;
@@ -6,7 +6,6 @@ import al.qa.so.BaseScreen;
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.anno.Trait;
 import com.codeborne.selenide.SelenideElement;
-import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
 import static com.codeborne.selenide.Selenide.$;

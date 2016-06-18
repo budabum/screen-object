@@ -1,4 +1,4 @@
-package screens;
+package screens.yandex;
 
 import al.qa.so.ActionType;
 import al.qa.so.BaseScreen;

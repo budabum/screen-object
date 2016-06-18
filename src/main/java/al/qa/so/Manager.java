@@ -1,6 +1,7 @@
 package al.qa.so;
 
 import al.qa.so.anno.ScreenParams;
+import al.qa.so.coverage.ScreensCoverage;
 import al.qa.so.exc.SOException;
 import al.qa.so.selenide.AllByResolver;
 import al.qa.so.selenide.ByResolver;
@@ -13,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.slf4j.Logger;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
@@ -35,7 +37,7 @@ class Manager {
     static <T extends BaseScreen> Class<T> register(Class<T> screenClass){
         checkScreen(screenClass);
         screens.add(screenClass);
-        COVERAGE.addScreen(screenClass);
+        createCoverageModel(screenClass);
         return screenClass;
     }
 
@@ -274,4 +276,73 @@ class Manager {
         });
         return screenPart;
     }
+
+    private static List<Field> getAllContainers(Class<?> classType){
+        List<Field> fields = new ArrayList<>();
+        Field[] declaredFields = classType.getDeclaredFields();
+        for(Field f : declaredFields){
+            FindBy findBy = f.getAnnotation(FindBy.class);
+            Class<?> fieldType = f.getType();
+            if(findBy != null && ElementsContainer.class.isAssignableFrom(fieldType)){
+                fields.add(f);
+            }
+        }
+        return fields;
+    }
+
+    private static List<Field> getAllFields(Class<?> classType){
+        List<Field> fields = new ArrayList<>();
+        Field[] declaredFields = classType.getDeclaredFields();
+        for(Field f : declaredFields){
+            FindBy findBy = f.getAnnotation(FindBy.class);
+            Class<?> fieldType = f.getType();
+            if(findBy != null && WebElement.class.isAssignableFrom(fieldType)){
+                fields.add(f);
+            }
+            if(findBy != null && ElementsContainer.class.isAssignableFrom(fieldType)){
+                fields.addAll(getAllFields(fieldType));
+            }
+        }
+        return fields;
+    }
+
+    private static Map<ActAs, List<Method>> getAllMethods(Class<?> classType){
+        Map<ActAs, List<Method>> methods = new HashMap<>();
+        Arrays.stream(ActAs.values()).forEach(a -> methods.put(a, new ArrayList<>()));
+        Method[] declaredMethods = classType.getDeclaredMethods();
+        for(Method m : declaredMethods){
+            ActionType actionType = m.getAnnotation(ActionType.class);
+            if(actionType != null){
+                ActAs actAs = actionType.value();
+                methods.get(actAs).add(m);
+            }
+        }
+        getAllContainers(classType).stream().map(Field::getType).forEach(c->{
+            methods.putAll(getAllMethods(c));
+        });
+        return methods;
+    }
+
+    private static void createCoverageModel(Class<? extends BaseScreen> screenClass){
+        ScreensCoverage sc = COVERAGE.addScreen(screenClass);
+        getAllFields(screenClass).stream().map(Field::getName).forEach(sc::addElement);
+        Map<ActAs, List<Method>> methods = getAllMethods(screenClass);
+        methods.keySet().stream().forEach(a -> {
+            switch(a){
+                case Action:
+                    methods.get(a).stream().map(Method::getName).forEach(sc::addAction);
+                    break;
+                case Check:
+                    methods.get(a).stream().map(Method::getName).forEach(sc::addCheck);
+                    break;
+                case Transition:
+                    methods.get(a).stream().forEach(m -> {
+                        Class<?> toScreenClass = m.getReturnType();
+                        sc.addTransition(m.getName(), toScreenClass.getSimpleName());
+                    });
+                    break;
+            }
+        });
+    }
+
 }

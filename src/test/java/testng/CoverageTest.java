@@ -2,10 +2,10 @@ package testng;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import screens.ImageSearchResultsScreen;
-import screens.ImagesScreen;
-import screens.MainScreen;
-import screens.SearchResultsScreen;
+import screens.yandex.ImageSearchResultsScreen;
+import screens.yandex.ImagesScreen;
+import screens.yandex.MainScreen;
+import screens.yandex.SearchResultsScreen;
 
 import static al.qa.so.coverage.Model.COVERAGE;
 

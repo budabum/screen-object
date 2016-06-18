@@ -1,11 +1,15 @@
 package screens;
 
 import al.qa.so.ScreenRegister;
+import screens.yandex.ImageSearchResultsScreen;
+import screens.yandex.ImagesScreen;
+import screens.yandex.MainScreen;
+import screens.yandex.SearchResultsScreen;
 
 /**
  * @author Alexey Lyanguzov.
  */
-public class TestScreens implements ScreenRegister{
+public class YandexScreens implements ScreenRegister{
 
     public static Class<MainScreen> MAIN_SCREEN = MainScreen.class;
     public static Class<ImagesScreen> IMAGES_SCREEN = ImagesScreen.class;

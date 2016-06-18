@@ -3,12 +3,12 @@ package testng;
 import al.qa.so.SO;
 import com.codeborne.selenide.Configuration;
 import org.testng.annotations.*;
-import screens.TestScreens;
+import screens.YandexScreens;
 
 import static al.qa.so.SO.navigateTo;
 import static al.qa.so.SO.onScreen;
 import static al.qa.so.coverage.Model.COVERAGE;
-import static screens.TestScreens.*;
+import static screens.YandexScreens.*;
 
 /**
  * @author Alexey Lyanguzov.
@@ -22,7 +22,7 @@ public class SampleTest1 {
         Configuration.browserSize = "1280x800";
         Configuration.screenshots = false;
 
-        SO.addScreens(TestScreens.class);
+        SO.addScreens(YandexScreens.class);
     }
 
     @AfterSuite
