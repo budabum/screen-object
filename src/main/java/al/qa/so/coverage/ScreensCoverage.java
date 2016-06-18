@@ -28,7 +28,7 @@ public class ScreensCoverage extends CoverageInfo {
         return checks.get(name);
     }
 
-    public ElementCoverage getElements(String name){
+    public ElementCoverage getElement(String name){
         return elements.get(name);
     }
 

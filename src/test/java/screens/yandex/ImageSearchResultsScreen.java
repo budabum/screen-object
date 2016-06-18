@@ -1,6 +1,6 @@
 package screens.yandex;
 
-import al.qa.so.ActionType;
+import al.qa.so.anno.ActionType;
 import al.qa.so.BaseScreen;
 import al.qa.so.Checker;
 import al.qa.so.ActAs;

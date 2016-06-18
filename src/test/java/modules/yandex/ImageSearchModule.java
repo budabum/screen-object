@@ -1,7 +1,7 @@
 package modules.yandex;
 
 import al.qa.so.ActAs;
-import al.qa.so.ActionType;
+import al.qa.so.anno.ActionType;
 import al.qa.so.ScreenPart;
 import al.qa.so.anno.Trait;
 import com.codeborne.selenide.ElementsContainer;

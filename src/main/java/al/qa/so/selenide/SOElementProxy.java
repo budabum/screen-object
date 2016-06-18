@@ -54,6 +54,9 @@ class SOElementProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        if(method.getName().equals("hashCode")){
+            return this.hashCode();
+        }
         init();
         doBeforeCall(method, args);
         Object res = method.invoke(realSelenideElement, args);
@@ -90,16 +93,16 @@ class SOElementProxy implements InvocationHandler {
             String strArgs = (args == null || args.length == 0) ? "" :
                 "('" + String.join(", ", Arrays.stream(args).map(Object::toString).collect(Collectors.toList()))+"')";
             LOG.trace("WebDriver Interaction: {}({}) on {} on {}",
-                method.getName(), strArgs, SO.fieldName(realSelenideElement), SO.currentScreen().name());
+                method.getName(), strArgs, SO.fieldName(hashCode()), SO.currentScreen().name());
             SO.getStepRecorder().driverInteraction("%s %s",
-                humanizeInteraction(method.getName(), strArgs), SO.fieldName(realSelenideElement));
+                humanizeInteraction(method.getName(), strArgs), SO.fieldName(hashCode()));
         }
         if(isShould(method)){
             Condition[] conditions;
             conditions = (args == null || args.length == 0) ? new Condition[]{} : (Condition[])args[0];
             String strArgs = String.join(", ", Arrays.stream(conditions).map(Object::toString).collect(Collectors.toList()));
-            LOG.trace("{} {}", SO.fieldName(realSelenideElement), humanizeShould(method.getName(), strArgs));
-            SO.getStepRecorder().driverInteraction("... expecting that %s %s", SO.fieldName(realSelenideElement),
+            LOG.trace("{} {}", SO.fieldName(hashCode()), humanizeShould(method.getName(), strArgs));
+            SO.getStepRecorder().driverInteraction("... expecting that %s %s", SO.fieldName(hashCode()),
                 humanizeShould(method.getName(), strArgs));
         }
     }

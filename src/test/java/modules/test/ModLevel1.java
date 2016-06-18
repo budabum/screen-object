@@ -1,7 +1,7 @@
 package modules.test;
 
 import al.qa.so.ActAs;
-import al.qa.so.ActionType;
+import al.qa.so.anno.ActionType;
 import al.qa.so.ScreenPart;
 import com.codeborne.selenide.ElementsContainer;
 import com.codeborne.selenide.SelenideElement;

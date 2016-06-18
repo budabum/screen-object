@@ -36,8 +36,8 @@ public class SO {
         throw new TestExecutionException(message);
     }
 
-    public static String fieldName(SelenideElement field){
-        return Manager.getFieldName(field);
+    public static String fieldName(int key){
+        return Manager.getFieldName(key);
     }
 
     public static StepRecorder getStepRecorder(){

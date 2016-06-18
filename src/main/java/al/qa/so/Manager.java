@@ -1,5 +1,6 @@
 package al.qa.so;
 
+import al.qa.so.anno.ActionType;
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.coverage.ScreensCoverage;
 import al.qa.so.exc.SOException;
@@ -31,7 +32,7 @@ class Manager {
     private static BaseScreen currentScreen = DefaultScreen.INSTANCE;
     private static final StepRecorder stepRecorder = new StepRecorder();
 
-    private static final Map<SelenideElement, String> fieldNames = new HashMap<>();
+    private static final FieldNames fieldNames = new FieldNames();
 
     //TODO: should not it be in SO?
     static <T extends BaseScreen> Class<T> register(Class<T> screenClass){
@@ -41,9 +42,12 @@ class Manager {
         return screenClass;
     }
 
-    static String getFieldName(SelenideElement key){
-        String name = fieldNames.get(key);
-        LOG.trace("Found field name: {} for key {}", name, key.hashCode());
+    static String getFieldName(int key){
+        String name = fieldNames.getFieldName(currentScreen.getClass(), key);
+        if(name != null){
+            COVERAGE.getScreen(currentScreen.name()).getElement(name).hit();
+        }
+        LOG.trace("Found field name: {} for key {}", name, key);
         return name;
     }
 
@@ -74,7 +78,7 @@ class Manager {
         LOG.info("Navigating from {} to {}", getCurrentScreen().name(), targetScreenName);
         if(isOnScreen(targetScreenName)){
             LOG.debug("Screen {} is already opened", targetScreenName);
-            return (T)currentScreen;
+            return instantiateScreen(targetScreenClass); //Need to instantiate screen because of transition to self
         }
         else if(forceNavigation){
             targetScreen = open(targetScreenClass);
@@ -138,20 +142,6 @@ class Manager {
         LOG.trace("Transition is done");
         COVERAGE.getScreen(currentScreen.name()).getTransition(transitionName).hit();
         return setCurrentScreen(targetScreen);
-    }
-
-    private static void setFieldNames() {
-        Arrays.stream(getCurrentScreen().getClass().getDeclaredFields()).forEach(field->{
-            if(field.getType().isAssignableFrom(SelenideElement.class)){
-                field.setAccessible(true);
-                try {
-                    SelenideElement key = (SelenideElement)field.get(getCurrentScreen());
-                    fieldNames.put(key, field.getName());
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     private static <T extends BaseScreen> String getName(Class<T> screenClass){
@@ -227,6 +217,7 @@ class Manager {
 
     private static <T extends BaseScreen> T instantiateScreen(Class<T> screenClass) {
         try{
+//            fieldNames.clear(screenClass);
             return initElements(screenClass.newInstance());
         } catch (InstantiationException | IllegalAccessException exc) {
             throw new SOException(exc);
@@ -251,10 +242,12 @@ class Manager {
                 LOG.trace("Instantiating field {}", fieldName);
                 Class<?> type = f.getType();
                 try {
-                    if(WebElement.class.isAssignableFrom(type)){
+                    if(SelenideElement.class.isAssignableFrom(type)){
                         SelenideElement selenideElement = ByResolver.INSTANCE.resolve(f);
                         f.set(screenPart, selenideElement);
-                        LOG.trace("... OK: SelenideElement: {}", fieldName);
+                        fieldNames.setFieldName(parentScreen.getClass(), selenideElement.hashCode(), fieldName);
+                        LOG.trace("... OK: SelenideElement: {}({})on {}",
+                            fieldName, selenideElement.hashCode(), parentScreen.getClass());
                     }
                     else if(type.isAssignableFrom(ElementsCollection.class)){
                         ElementsCollection elementsCollection = AllByResolver.INSTANCE.resolve(f);
