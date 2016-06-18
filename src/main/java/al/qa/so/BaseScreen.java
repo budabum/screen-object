@@ -120,7 +120,7 @@ public abstract class BaseScreen<ScreenChecker extends Checker> implements Scree
         for(Field traitField : traits){
             traitField.setAccessible(true);
             SelenideElement trait = getTrait(traitField);
-            LOG.debug("Waitinh for trait: {}", traitField.getName());
+            LOG.debug("Waiting for trait: {}", traitField.getName());
             trait.shouldBe(visible);
         }
         return true;

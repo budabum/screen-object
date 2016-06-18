@@ -3,8 +3,8 @@ package al.qa.so.coverage;
 /**
  * @author Alexey Lyanguzov.
  */
-public class ActionsCoverage extends CoverageInfo {
-    ActionsCoverage(String name) {
+public class ActionCoverage extends CoverageInfo {
+    ActionCoverage(String name) {
         super(name);
     }
 }

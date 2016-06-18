@@ -5,6 +5,7 @@ package al.qa.so.coverage;
  */
 abstract class CoverageInfo {
     private final String name;
+    private int hits = 0;
 
     CoverageInfo(String name) {
         this.name = name;
@@ -12,6 +13,14 @@ abstract class CoverageInfo {
 
     String getName() {
         return name;
+    }
+
+    public int getHits() {
+        return hits;
+    }
+
+    public void hit(){
+        hits++;
     }
 
     @Override
@@ -32,6 +41,6 @@ abstract class CoverageInfo {
 
     @Override
     public String toString() {
-        return name;
+        return String.format("%s(%s)", name, hits);
     }
 }

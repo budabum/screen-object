@@ -4,26 +4,40 @@ import al.qa.so.BaseScreen;
 import al.qa.so.exc.SOCoverageException;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author Alexey Lyanguzov.
  */
 public class ScreensCoverage extends CoverageInfo {
-    private final Map<String, ActionsCoverage> actions = new LinkedHashMap<>();
-    private final Map<String, ChecksCoverage> checks = new LinkedHashMap<>();
-    private final Map<String, ElementsCoverage> elements = new LinkedHashMap<>();
+    private final Map<String, ActionCoverage> actions = new LinkedHashMap<>();
+    private final Map<String, CheckCoverage> checks = new LinkedHashMap<>();
+    private final Map<String, ElementCoverage> elements = new LinkedHashMap<>();
     private final Map<String, TransitionsCoverage> transitions = new LinkedHashMap<>();
 
 
-    public ScreensCoverage(Class<? extends BaseScreen> screenClass) {
+    ScreensCoverage(Class<? extends BaseScreen> screenClass) {
         super(screenClass.getSimpleName());
     }
 
+    public ActionCoverage getAction(String name){
+        return actions.get(name);
+    }
+
+    public CheckCoverage getCheck(String name){
+        return checks.get(name);
+    }
+
+    public ElementCoverage getElements(String name){
+        return elements.get(name);
+    }
+
+    public TransitionsCoverage getTransition(String name){
+        return transitions.get(name);
+    }
+
     public ScreensCoverage addAction(String methodName){
-        ActionsCoverage coverageInfo = new ActionsCoverage(methodName);
+        ActionCoverage coverageInfo = new ActionCoverage(methodName);
         if(actions.containsKey(coverageInfo.getName())){
             throw new SOCoverageException("Action %s is already added to coverage model for screen %s",
                 coverageInfo.getName(), this.getName());
@@ -34,7 +48,7 @@ public class ScreensCoverage extends CoverageInfo {
     }
 
     public ScreensCoverage addCheck(String methodName){
-        ChecksCoverage coverageInfo = new ChecksCoverage(methodName);
+        CheckCoverage coverageInfo = new CheckCoverage(methodName);
         if(checks.containsKey(coverageInfo.getName())){
             throw new SOCoverageException("Check %s is already added to coverage model for screen %s",
                 coverageInfo.getName(), this.getName());
@@ -45,7 +59,7 @@ public class ScreensCoverage extends CoverageInfo {
     }
 
     public ScreensCoverage addElement(String methodName){
-        ElementsCoverage coverageInfo = new ElementsCoverage(methodName);
+        ElementCoverage coverageInfo = new ElementCoverage(methodName);
         if(elements.containsKey(coverageInfo.getName())){
             throw new SOCoverageException("Element %s is already added to coverage model for screen %s",
                 coverageInfo.getName(), this.getName());
@@ -68,7 +82,7 @@ public class ScreensCoverage extends CoverageInfo {
 
     @Override
     public String toString() {
-        return String.format("\n\tActions: %s\n\tChecks: %s\n\tElements: %s \n\tTransitions: %s\n",
-            actions, checks, elements, transitions);
+        return String.format("(%s)\n\tActions: %s\n\tChecks: %s\n\tElements: %s \n\tTransitions: %s\n",
+            this.getHits(), actions, checks, elements, transitions);
     }
 }

@@ -60,10 +60,10 @@ class Manager {
         BaseScreen oldCurrentScreen = currentScreen;
         currentScreen = newCurrentScreen;
         LOG.info("Setting current screen => {}", currentScreen.name());
-        setFieldNames();
         if(!oldCurrentScreen.name().equals(newCurrentScreen.name())){
             stepRecorder.onScreen("On screen %s", currentScreen.name());
         }
+        COVERAGE.getScreen(currentScreen.name()).hit();
         return getCurrentScreen();
     }
 
@@ -113,6 +113,7 @@ class Manager {
     private static <T, R extends BaseScreen> R doAction(String actionName, Consumer<T> proc, T argument) {
         stepRecorder.actionCall("Do action %s(%s)", actionName, currentScreen.name());
         proc.accept(argument);
+        COVERAGE.getScreen(currentScreen.name()).getAction(actionName).hit();
         return getCurrentScreen();
     }
 
@@ -120,6 +121,7 @@ class Manager {
     private static <T, R extends BaseScreen> R doCheck(String checkName, Consumer<T> proc, T argument) {
         stepRecorder.performCheck("Check %s", checkName);
         proc.accept(argument);
+        COVERAGE.getScreen(currentScreen.name()).getCheck(checkName).hit();
         return getCurrentScreen();
     }
 
@@ -134,6 +136,7 @@ class Manager {
                     targetScreen.name(), currentScreen.name());
         }
         LOG.trace("Transition is done");
+        COVERAGE.getScreen(currentScreen.name()).getTransition(transitionName).hit();
         return setCurrentScreen(targetScreen);
     }
 

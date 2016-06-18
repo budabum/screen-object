@@ -3,8 +3,8 @@ package al.qa.so.coverage;
 /**
  * @author Alexey Lyanguzov.
  */
-public class ElementsCoverage extends CoverageInfo {
-    ElementsCoverage(String name) {
+public class ElementCoverage extends CoverageInfo {
+    ElementCoverage(String name) {
         super(name);
     }
 }
