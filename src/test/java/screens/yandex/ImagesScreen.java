@@ -4,7 +4,7 @@ import al.qa.so.BaseScreen;
 import al.qa.so.Checker;
 import al.qa.so.anno.ScreenParams;
 import al.qa.so.anno.Trait;
-import modules.ImageSearchModule;
+import modules.yandex.ImageSearchModule;
 import org.openqa.selenium.support.FindBy;
 
 /**

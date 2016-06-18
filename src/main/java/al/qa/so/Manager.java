@@ -318,7 +318,10 @@ class Manager {
             }
         }
         getAllContainers(classType).stream().map(Field::getType).forEach(c->{
-            methods.putAll(getAllMethods(c));
+            Map<ActAs, List<Method>> submethods = getAllMethods(c);
+            submethods.keySet().forEach(key -> {
+                methods.get(key).addAll(submethods.get(key));
+            });
         });
         return methods;
     }

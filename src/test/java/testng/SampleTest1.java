@@ -3,6 +3,7 @@ package testng;
 import al.qa.so.SO;
 import com.codeborne.selenide.Configuration;
 import org.testng.annotations.*;
+import screens.TestScreens;
 import screens.YandexScreens;
 
 import static al.qa.so.SO.navigateTo;
@@ -23,6 +24,7 @@ public class SampleTest1 {
         Configuration.screenshots = false;
 
         SO.addScreens(YandexScreens.class);
+        SO.addScreens(TestScreens.class);
     }
 
     @AfterSuite

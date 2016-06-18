@@ -1,4 +1,4 @@
-package modules;
+package modules.yandex;
 
 import al.qa.so.ActAs;
 import al.qa.so.ActionType;

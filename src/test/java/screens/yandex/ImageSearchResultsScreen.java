@@ -10,7 +10,7 @@ import al.qa.so.utils.url.UriComparator;
 import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import modules.ImageSearchModule;
+import modules.yandex.ImageSearchModule;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
