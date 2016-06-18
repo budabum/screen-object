@@ -17,6 +17,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static al.qa.so.coverage.Model.COVERAGE;
+
 /**
  * @author Alexey Lyanguzov.
  */
@@ -33,6 +35,7 @@ class Manager {
     static <T extends BaseScreen> Class<T> register(Class<T> screenClass){
         checkScreen(screenClass);
         screens.add(screenClass);
+        COVERAGE.addScreen(screenClass);
         return screenClass;
     }
 

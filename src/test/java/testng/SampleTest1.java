@@ -2,14 +2,12 @@ package testng;
 
 import al.qa.so.SO;
 import com.codeborne.selenide.Configuration;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import screens.TestScreens;
 
 import static al.qa.so.SO.navigateTo;
 import static al.qa.so.SO.onScreen;
+import static al.qa.so.coverage.Model.COVERAGE;
 import static screens.TestScreens.*;
 
 /**
@@ -25,6 +23,11 @@ public class SampleTest1 {
         Configuration.screenshots = false;
 
         SO.addScreens(TestScreens.class);
+    }
+
+    @AfterSuite
+    private void after1(){
+        System.out.println(COVERAGE);
     }
 
     @BeforeMethod
