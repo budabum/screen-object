@@ -15,9 +15,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
 import static al.qa.so.ActAs.Action;
-import static com.codeborne.selenide.Condition.appear;
-import static com.codeborne.selenide.Condition.hidden;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
 /**
@@ -57,6 +56,7 @@ public class ImageSearchResultsScreen extends BaseScreen<ImageSearchResultsScree
     @ActionType(ActAs.Check)
     public ImageSearchResultsScreen returnedResultsCount(int size){
         return perform(c -> {
+            $("not exists").shouldNot(exist);
             ElementsCollection resultTexts = $$(By.xpath(RESULTS_LIST_XPATH + "//div[contains(@class, 'serp-item')]"));
             resultTexts.shouldHave(CollectionCondition.sizeGreaterThanOrEqual(size));
         });
