@@ -59,6 +59,7 @@ public abstract class BaseScreen<ScreenChecker extends Checker> implements Scree
     }
 
     boolean isOpened(boolean waitForProgress){
+        if(SO.CONFIG.dryRun) { return true; }
         SO.getStepRecorder().setDoAdd(false);
         boolean result = waitForNoProgressIndicator(waitForProgress) &&
                 waitForTraits() &&
@@ -68,7 +69,9 @@ public abstract class BaseScreen<ScreenChecker extends Checker> implements Scree
     }
 
     void _open(){
-        directOpen();
+        if(!SO.CONFIG.dryRun){
+            directOpen();
+        }
     }
 
     void addContainer(ElementsContainer container){

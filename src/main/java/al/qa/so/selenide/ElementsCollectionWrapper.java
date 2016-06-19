@@ -1,5 +1,6 @@
 package al.qa.so.selenide;
 
+import al.qa.so.SO;
 import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
@@ -29,36 +30,43 @@ class ElementsCollectionWrapper extends ElementsCollection implements IElementCo
 
     @Override
     public ElementsCollection shouldHaveSize(int expectedSize) {
+        if(SO.CONFIG.dryRun) { return this; }
         return getReaElementsCollection(expectedSize).shouldHaveSize(expectedSize);
     }
 
     @Override
     public ElementsCollection shouldBe(CollectionCondition... conditions) {
+        if(SO.CONFIG.dryRun) { return this; }
         return getReaElementsCollection(conditions).shouldBe(conditions);
     }
 
     @Override
     public ElementsCollection shouldHave(CollectionCondition... conditions) {
+        if(SO.CONFIG.dryRun) { return this; }
         return getReaElementsCollection(conditions).shouldHave(conditions);
     }
 
     @Override
     public ElementsCollection filter(Condition condition) {
+        if(SO.CONFIG.dryRun) { return this; }
         return getReaElementsCollection(condition).filter(condition);
     }
 
     @Override
     public ElementsCollection filterBy(Condition condition) {
+        if(SO.CONFIG.dryRun) { return this; }
         return getReaElementsCollection(condition).filterBy(condition);
     }
 
     @Override
     public ElementsCollection exclude(Condition condition) {
+        if(SO.CONFIG.dryRun) { return this; }
         return getReaElementsCollection(condition).exclude(condition);
     }
 
     @Override
     public ElementsCollection excludeWith(Condition condition) {
+        if(SO.CONFIG.dryRun) { return this; }
         return getReaElementsCollection(condition).excludeWith(condition);
     }
 

@@ -1,6 +1,7 @@
 package al.qa.so.selenide;
 
 import al.qa.so.SO;
+import al.qa.so.exc.SOException;
 import al.qa.so.utils.Utils;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
@@ -8,8 +9,8 @@ import org.openqa.selenium.By;
 import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -53,15 +54,24 @@ class SOElementProxy implements InvocationHandler {
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) {
         if(method.getName().equals("hashCode")){
             return this.hashCode();
         }
         init();
         doBeforeCall(method, args);
-        Object res = method.invoke(realSelenideElement, args);
+        Object res = invokeMethod(method, realSelenideElement, args);
         doAfterCall(method, args);
         return res;
+    }
+
+    private Object invokeMethod(Method method, Object target, Object[] args){
+        try {
+            if(SO.CONFIG.dryRun) { return null; }
+            return method.invoke(target, args);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new SOException(e);
+        }
     }
 
     private String humanizeInteraction(String methodName, String strArgs){
@@ -89,20 +99,22 @@ class SOElementProxy implements InvocationHandler {
     }
 
     private void reportWebDriverInteraction(Method method, Object[] args) {
+        String fieldName = SO.fieldName(hashCode());
         if(isWebdriveInteraction(method)){
             String strArgs = (args == null || args.length == 0) ? "" :
                 "('" + String.join(", ", Arrays.stream(args).map(Object::toString).collect(Collectors.toList()))+"')";
             LOG.trace("WebDriver Interaction: {}({}) on {} on {}",
-                method.getName(), strArgs, SO.fieldName(hashCode()), SO.currentScreen().name());
+                method.getName(), strArgs, fieldName, SO.currentScreen().name());
             SO.getStepRecorder().driverInteraction("%s %s",
-                humanizeInteraction(method.getName(), strArgs), SO.fieldName(hashCode()));
+                humanizeInteraction(method.getName(), strArgs), fieldName);
         }
         if(isShould(method)){
             Condition[] conditions;
             conditions = (args == null || args.length == 0) ? new Condition[]{} : (Condition[])args[0];
             String strArgs = String.join(", ", Arrays.stream(conditions).map(Object::toString).collect(Collectors.toList()));
-            LOG.trace("{} {}", SO.fieldName(hashCode()), humanizeShould(method.getName(), strArgs));
-            SO.getStepRecorder().driverInteraction("... expecting that %s %s", SO.fieldName(hashCode()),
+//            String fieldName = SO.fieldName(hashCode());
+            LOG.trace("{} {}", fieldName, humanizeShould(method.getName(), strArgs));
+            SO.getStepRecorder().driverInteraction("... expecting that %s %s", fieldName,
                 humanizeShould(method.getName(), strArgs));
         }
     }

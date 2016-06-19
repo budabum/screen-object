@@ -12,6 +12,9 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.support.FindBy;
 
+import static al.qa.so.ActAs.Check;
+import static al.qa.so.ActAs.Transition;
+
 /**
  * @author Alexey Lyanguzov.
  */
@@ -39,7 +42,7 @@ public class SearchResultsScreen extends BaseScreen<SearchResultsScreen> impleme
 
     /******** TRANSITIONS *********/
 
-    @ActionType(ActAs.Transition)
+    @ActionType(Transition)
     public SearchResultsScreen search(String searchPhrase){
         return perform(p->{
             searchField.setValue(searchPhrase);
@@ -49,12 +52,12 @@ public class SearchResultsScreen extends BaseScreen<SearchResultsScreen> impleme
 
     /******** CHECKS *********/
 
-    @ActionType(ActAs.Check)
+    @ActionType(Check)
     public SearchResultsScreen returnedResultsCount(int size){
         return perform(c -> resultTexts.shouldHaveSize(size));
     }
 
-    @ActionType(ActAs.Check)
+    @ActionType(Check)
     public SearchResultsScreen allSearchResultContains(String phrase){
         return perform(c->{
             resultTexts.stream().forEach(p -> p.should(Condition.matchText("(?i)"+phrase)));

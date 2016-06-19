@@ -14,6 +14,7 @@ import modules.yandex.ImageSearchModule;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
+import static al.qa.so.ActAs.Action;
 import static com.codeborne.selenide.Condition.appear;
 import static com.codeborne.selenide.Condition.hidden;
 import static com.codeborne.selenide.Condition.visible;
@@ -40,7 +41,7 @@ public class ImageSearchResultsScreen extends BaseScreen<ImageSearchResultsScree
 
     /******** ACTIONS *********/
 
-    @ActionType(ActAs.Action)
+    @ActionType(Action)
     public ImageSearchResultsScreen changeSizeTo(String sizeName){
         return perform(a-> {
             sizeChooserButton.shouldBe(visible);

@@ -12,6 +12,8 @@ import java.util.Arrays;
  */
 @SuppressWarnings("unused")
 public class SO {
+    public static final Config CONFIG = new Config();
+
     @SuppressWarnings("unchecked")
     public static <T extends BaseScreen> void addScreens(Class<? extends ScreenRegister> registerClass) {
         Arrays.stream(registerClass.getFields()).forEach(field -> {

@@ -8,6 +8,7 @@ import al.qa.so.anno.Trait;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.support.FindBy;
 
+import static al.qa.so.ActAs.Transition;
 import static com.codeborne.selenide.Selenide.$;
 
 /**
@@ -27,7 +28,7 @@ public class MainScreen extends BaseScreen {
     @Trait @FindBy(xpath = "//button[contains(@class,'suggest2-form')]")
     private SelenideElement findButton;
 
-    @ActionType(ActAs.Transition)
+    @ActionType(Transition)
     public SearchResultsScreen search(String searchPhrase){
         return perform(p->{
             searchField.setValue(searchPhrase);

@@ -52,6 +52,11 @@
             <version>6.9.10</version>
             <!--scope>test</scope-->
         </dependency>
+        <dependency>
+            <groupId>com.github.fmcarvalho</groupId>
+            <artifactId>htmlflow</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>

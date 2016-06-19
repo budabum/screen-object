@@ -25,11 +25,13 @@ public class SampleTest1 {
 
         SO.addScreens(YandexScreens.class);
         SO.addScreens(TestScreens.class);
+        SO.CONFIG.dryRun = !true;
     }
 
     @AfterSuite
     private void after1(){
         System.out.println(COVERAGE);
+//        COVERAGE.report();
     }
 
     @BeforeMethod
@@ -45,7 +47,7 @@ public class SampleTest1 {
     @Test(enabled = false)
     public void dummyTest(){}
 
-    @Test(enabled = false)
+    @Test(enabled = !false)
     public void testSearchText(){
         String phrase = "something";
         String phrase2 = "anything";
