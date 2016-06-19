@@ -1,7 +1,9 @@
 package al.qa.so;
 
+import al.qa.so.exc.SOException;
+import al.qa.so.selenide.AllByResolver;
+import al.qa.so.selenide.ByResolver;
 import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -22,35 +24,35 @@ public interface ScreenPart {
     }
 
     default SelenideElement $(By by){
-        return Selenide.$(by);
+        return ByResolver.INSTANCE.create(by);
     }
 
     default SelenideElement $(By by, int index){
-        return Selenide.$(by, index);
+        throw new SOException("Not yet implemented");
     }
 
     default SelenideElement $(String selector){
-        return Selenide.$(selector);
+        return ByResolver.INSTANCE.cssSelector(selector);
     }
 
     default SelenideElement $(String selector, int index){
-        return Selenide.$(selector, index);
+        throw new SOException("Not yet implemented");
     }
 
     default SelenideElement $(WebElement element){
-        return Selenide.$(element);
+        throw new SOException("Not yet implemented");
     }
 
     default ElementsCollection $$(By by){
-        return Selenide.$$(by);
+        return AllByResolver.INSTANCE.create(by);
     }
 
     default ElementsCollection $$(String selector){
-        return Selenide.$$(selector);
+        return AllByResolver.INSTANCE.cssSelector(selector);
     }
 
     default ElementsCollection $$(Collection<? extends WebElement> collection){
-        return Selenide.$$(collection);
+        throw new SOException("Not yet implemented");
     }
 
     @SuppressWarnings("all")
