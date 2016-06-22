@@ -105,8 +105,7 @@ class SOElementProxy implements InvocationHandler {
                 "('" + String.join(", ", Arrays.stream(args).map(Object::toString).collect(Collectors.toList()))+"')";
             LOG.trace("WebDriver Interaction: {}({}) on {} on {}",
                 method.getName(), strArgs, fieldName, SO.currentScreen().name());
-            SO.getStepRecorder().driverInteraction("%s %s",
-                humanizeInteraction(method.getName(), strArgs), fieldName);
+            SO.getStepRecorder().driverInteraction(humanizeInteraction(method.getName(), strArgs), fieldName);
         }
         if(isShould(method)){
             Condition[] conditions;
@@ -114,8 +113,7 @@ class SOElementProxy implements InvocationHandler {
             String strArgs = String.join(", ", Arrays.stream(conditions).map(Object::toString).collect(Collectors.toList()));
 //            String fieldName = SO.fieldName(hashCode());
             LOG.trace("{} {}", fieldName, humanizeShould(method.getName(), strArgs));
-            SO.getStepRecorder().driverInteraction("... expecting that %s %s", fieldName,
-                humanizeShould(method.getName(), strArgs));
+            SO.getStepRecorder().driverInteractionCheck(fieldName, humanizeShould(method.getName(), strArgs));
         }
     }
 

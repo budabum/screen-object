@@ -44,14 +44,19 @@ public abstract class BaseScreen<ScreenChecker extends Checker> implements Scree
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends BaseScreen> T ensure(Consumer<ScreenChecker> proc){
+    public ScreenChecker ensure(){
+        return (ScreenChecker) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ScreenChecker ensure(Consumer<ScreenChecker> proc){
         return ensure((ScreenChecker)this, proc);
     }
 
     @SuppressWarnings("all")
-    public <T extends BaseScreen> T ensure(ScreenChecker checker, Consumer<ScreenChecker> proc){
+    public ScreenChecker ensure(ScreenChecker checker, Consumer<ScreenChecker> proc){
         proc.accept(checker);
-        return (T)this;
+        return checker;
     }
 
     boolean isOpened(){

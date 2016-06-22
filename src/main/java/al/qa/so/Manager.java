@@ -6,7 +6,7 @@ import al.qa.so.coverage.ScreensCoverage;
 import al.qa.so.exc.SOException;
 import al.qa.so.selenide.AllByResolver;
 import al.qa.so.selenide.ByResolver;
-import al.qa.so.utils.StepRecorder;
+import al.qa.so.utils.recorder.StepRecorder;
 import al.qa.so.utils.Utils;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.ElementsContainer;
@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static al.qa.so.coverage.Model.COVERAGE;
-import static com.codeborne.selenide.Selenide.sleep;
 
 /**
  * @author Alexey Lyanguzov.
@@ -66,7 +65,7 @@ class Manager {
         currentScreen = newCurrentScreen;
         LOG.info("Setting current screen => {}", currentScreen.name());
         if(!oldCurrentScreen.name().equals(newCurrentScreen.name())){
-            stepRecorder.onScreen("On screen %s", currentScreen.name());
+            stepRecorder.onScreen(currentScreen.name());
         }
         COVERAGE.getScreen(currentScreen.name()).hit();
         return getCurrentScreen();
@@ -116,7 +115,7 @@ class Manager {
 
     @SuppressWarnings("unchecked")
     private static <T, R extends BaseScreen> R doAction(String actionName, Consumer<T> proc, T argument) {
-        stepRecorder.actionCall("Do action %s(%s)", actionName, currentScreen.name());
+        stepRecorder.actionCall(actionName, currentScreen.name());
         proc.accept(argument);
         COVERAGE.getScreen(currentScreen.name()).getAction(actionName).hit();
         return getCurrentScreen();
@@ -124,7 +123,7 @@ class Manager {
 
     @SuppressWarnings("unchecked")
     private static <T, R extends BaseScreen> R doCheck(String checkName, Consumer<T> proc, T argument) {
-        stepRecorder.performCheck("Check %s", checkName);
+        stepRecorder.performCheck(checkName);
         proc.accept(argument);
         COVERAGE.getScreen(currentScreen.name()).getCheck(checkName).hit();
         return getCurrentScreen();
@@ -133,9 +132,14 @@ class Manager {
     @SuppressWarnings("unchecked")
     private static <T, R extends BaseScreen> R doTransition(String transitionName, Consumer<T> proc, T argument) {
         R targetScreen = getTargetScreen(transitionName);
-        stepRecorder.actionCall("Do transition '%s' from %s", transitionName, currentScreen.name());
-        proc.accept(argument);
-        stepRecorder.actionCall(" ... expecting to be on %s", targetScreen.name());
+        stepRecorder.transitionCall(transitionName, currentScreen.name());
+        try {
+            proc.accept(argument);
+        }
+        catch(NullPointerException npe){
+            if(!SO.CONFIG.dryRun) throw npe;
+        }
+        stepRecorder.transitionExpectation(targetScreen.name());
         if(!targetScreen.isOpened()){
             throw new SOException("Screen %s is not opened. Current screen is %s",
                     targetScreen.name(), currentScreen.name());

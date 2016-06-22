@@ -7,4 +7,6 @@ public class Config {
 
     public boolean dryRun = false;
 
+    public boolean reportWebDriverInteraction = true;
+
 }

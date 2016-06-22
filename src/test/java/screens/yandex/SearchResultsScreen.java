@@ -14,6 +14,7 @@ import org.openqa.selenium.support.FindBy;
 
 import static al.qa.so.ActAs.Check;
 import static al.qa.so.ActAs.Transition;
+import static com.codeborne.selenide.Condition.visible;
 
 /**
  * @author Alexey Lyanguzov.
@@ -46,6 +47,7 @@ public class SearchResultsScreen extends BaseScreen<SearchResultsScreen> impleme
     public SearchResultsScreen search(String searchPhrase){
         return perform(p->{
             searchField.setValue(searchPhrase);
+            findButton.shouldBe(visible);
             findButton.click();
         });
     }

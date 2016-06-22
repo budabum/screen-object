@@ -1,9 +1,8 @@
 package al.qa.so;
 
 import al.qa.so.exc.TestExecutionException;
-import al.qa.so.utils.StepRecorder;
+import al.qa.so.utils.recorder.StepRecorder;
 import al.qa.so.utils.Utils;
-import com.codeborne.selenide.SelenideElement;
 
 import java.util.Arrays;
 
