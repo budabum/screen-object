@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static al.qa.so.coverage.Model.COVERAGE;
+import static com.codeborne.selenide.Selenide.sleep;
 
 /**
  * @author Alexey Lyanguzov.
@@ -216,6 +217,9 @@ class Manager {
     }
 
     private static <T extends BaseScreen> T instantiateScreen(Class<T> screenClass) {
+        if(!screens.contains(screenClass)){
+            throw new SOException("Screen class %s is not registered.", screenClass.getSimpleName());
+        }
         try{
 //            fieldNames.clear(screenClass);
             return initElements(screenClass.newInstance());

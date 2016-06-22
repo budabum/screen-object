@@ -26,7 +26,7 @@ import static com.codeborne.selenide.WebDriverRunner.url;
 /**
  * @author Alexey Lyanguzov.
  */
-public abstract class BaseScreen<ScreenChecker extends Checker> implements ScreenPart {
+public abstract class BaseScreen<ScreenChecker extends Checker> implements ScreenPart, Checker {
     protected final ByResolver by = ByResolver.INSTANCE;
     protected final AllByResolver allby = AllByResolver.INSTANCE;
 
