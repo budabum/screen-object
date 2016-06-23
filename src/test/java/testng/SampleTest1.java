@@ -51,6 +51,7 @@ public class SampleTest1 {
     public void testSearchText(){
         String phrase = "something";
         String phrase2 = "anything";
+
         navigateTo(MAIN_SCREEN)
             .search(phrase)
             .ensure(c->{c

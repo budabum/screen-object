@@ -13,6 +13,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
 import static al.qa.so.ActAs.Check;
+import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.$$;
 
 /**
@@ -36,9 +37,9 @@ public class GoogleResultsPage extends BaseScreen<GoogleResultsPage> {
     }
 
     @ActionType(Check)
-    public GoogleResultsPage allSearchResultContains(String phrase){
+    public GoogleResultsPage firstSearchResults(String aText){
         return perform(c->{
-            results.stream().forEach(p -> p.should(Condition.matchText("(?i)"+phrase)));
+            results.first().shouldHave(text(aText));
         });
     }
 }

@@ -2,13 +2,11 @@ package testng;
 
 import al.qa.so.SO;
 import com.codeborne.selenide.Configuration;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import screens.GoogleScreens;
 
 import static al.qa.so.SO.navigateTo;
+import static al.qa.so.coverage.Model.COVERAGE;
 import static screens.GoogleScreens.SEARCH_PAGE;
 
 /**
@@ -22,7 +20,7 @@ public class GoogleTest {
         Configuration.browserSize = "1024x768";
 
         SO.addScreens(GoogleScreens.class);
-        SO.CONFIG.dryRun = true;
+//        SO.CONFIG.dryRun = true;
 //        SO.CONFIG.reportWebDriverInteraction = false;
     }
 
@@ -35,13 +33,20 @@ public class GoogleTest {
         SO.getStepRecorder().printSteps();
     }
 
+    @AfterSuite
+    private void after1(){
+        System.out.println(COVERAGE);
+//        COVERAGE.report();
+    }
+
     @Test
     public void selenideExamplePageObjectTest(){
         navigateTo(SEARCH_PAGE)
             .search("selenide")
-            .ensure()
+            .ensure(c->{c
                 .returnedResultsCount(10)
-                .allSearchResultContains("selenide");
+                .firstSearchResults("Selenide: лаконичные и стабильные UI тесты на Java");
+            });
     }
 
 }
